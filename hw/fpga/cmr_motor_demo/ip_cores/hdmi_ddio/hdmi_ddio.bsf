@@ -1,0 +1,65 @@
+/*
+WARNING: Do NOT edit the input and output ports in this file in a text
+editor if you plan to continue editing the block that represents it in
+the Block Editor! File corruption is VERY likely to occur.
+*/
+/*
+Copyright (C) 2019  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details, at
+https://fpgasoftware.intel.com/eula.
+*/
+(header "symbol" (version "1.2"))
+(symbol
+	(rect 0 0 256 112)
+	(text "hdmi_ddio" (rect 95 -10 202 16)(font "Dialog" (font_size 10)))
+	(text "inst" (rect 8 90 33 108)(font "Arial" ))
+	(port
+		(pt 0 48)
+		(input)
+		(text "datain_h[8..0]" (rect 0 0 113 21)(font "Dialog" (font_size 8)))
+		(text "datain_h[8..0]" (rect 4 27 99 47)(font "Dialog" (font_size 8)))
+		(line (pt 0 48)(pt 96 48)(line_width 3))
+	)
+	(port
+		(pt 0 64)
+		(input)
+		(text "datain_l[8..0]" (rect 0 0 107 21)(font "Dialog" (font_size 8)))
+		(text "datain_l[8..0]" (rect 4 43 94 63)(font "Dialog" (font_size 8)))
+		(line (pt 0 64)(pt 96 64)(line_width 3))
+	)
+	(port
+		(pt 0 80)
+		(input)
+		(text "outclock" (rect 0 0 69 21)(font "Dialog" (font_size 8)))
+		(text "outclock" (rect 4 59 62 79)(font "Dialog" (font_size 8)))
+		(line (pt 0 80)(pt 96 80))
+	)
+	(port
+		(pt 256 48)
+		(output)
+		(text "dataout[8..0]" (rect 0 0 102 21)(font "Dialog" (font_size 8)))
+		(text "dataout[8..0]" (rect 184 27 270 47)(font "Dialog" (font_size 8)))
+		(line (pt 256 48)(pt 160 48)(line_width 3))
+	)
+	(drawing
+		(line (pt 96 32)(pt 160 32))
+		(line (pt 160 32)(pt 160 96))
+		(line (pt 96 96)(pt 160 96))
+		(line (pt 96 32)(pt 96 96))
+		(line (pt 0 0)(pt 256 0))
+		(line (pt 256 0)(pt 256 112))
+		(line (pt 0 112)(pt 256 112))
+		(line (pt 0 0)(pt 0 112))
+	)
+)

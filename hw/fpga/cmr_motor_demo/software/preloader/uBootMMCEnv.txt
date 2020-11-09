@@ -1,0 +1,45 @@
+autoload=no
+bootdelay=5
+baudrate=115200
+bm_exe=run mmcloadfpga; run fpgaload; fatload mmc 0:1 0x00100040 cmr.bin; go 0x00100040
+bootargs=console=ttyS0,115200 root=/dev/mmcblk0p2 rw rootwait
+bootlinux=run mmcload; run mmcboot
+bootcmd=run bm_exe
+verify=n
+preboot=run setup_usb; ab1805 cs ${rtccal};run setup_eth
+setup_usb=gpio set 0
+setup_eth=gpio clear 28;gpio set 28;gpio clear 28
+loadfdtaddr=0x00000100
+loadkerneladdr=0xA000
+loadinitramfsaddr=0x3000000
+loadfpgaaddr=0x2000000
+loadfpgasize=0x700000
+fpgaload=run bridge_disable;fpga load 0 ${loadfpgaaddr} ${loadfpgasize}; run bridge_enable_handoff
+fpga=0
+mmcboot=run mmcsetbootargs;run fpgaload;bootz ${loadkerneladdr} - ${loadfdtaddr}
+mmcextpart=3
+mmcfatpart=1
+mmcsetbootargs=setenv bootargs console=ttyS0,115200 root=${mmcroot} rw rootwait
+mmcload=mmc rescan;run mmcloadkernel;run mmcloadfdt;run mmcloadfpga
+mmcloadkernel=ext2load mmc 0:${mmcextpart} ${loadkerneladdr} ${mmckernelloc}
+mmcloadfdt=ext2load mmc 0:${mmcextpart} ${loadfdtaddr} ${mmcfdtloc}
+mmcloadfpga=fatload mmc 0:${mmcfatpart} ${loadfpgaaddr} ${mmcfpgaloc}
+mmcloadpart=2
+mmcroot=/dev/mmcblk0p3
+mmcfdtloc=/boot/mitysom-5csx-cmr.dtb
+mmckernelloc=/boot/zImage
+mmcfpgaloc=/dev_5cs.rbf
+qspiboot=run qspisetbootargs;run fpgaload;bootz ${loadkerneladdr} ${loadinitramfsaddr} ${loadfdtaddr}
+qspisetbootargs=setenv bootargs console=ttyS0,115200 root=/dev/ram0
+qspikernelloc=0xe0000
+qspikernelsize=0x600000
+qspifdtloc=0x50000
+qspifdtsize=0x6000
+qspifpgaloc=0x8E0000
+qspiinitfsramloc=0x0
+qspiinitfsramsize=0x1000000
+qspiload=run qspiloadkernel;run qspiloadfdt;run qspiloadfpga;run qspiloadinitramfs
+qspiloadkernel=sf probe 0; sf read ${loadkerneladdr} ${qspikernelloc} ${qspikernelsize}
+qspiloadfdt=sf probe 0; sf read ${loadfdtaddr} ${qspifdtloc} ${qspifdtsize}
+qspiloadfpga=sf probe 0; sf read ${loadfpgaaddr} ${qspifpgaloc} ${loadfpgasize}
+qspiloadinitramfs=sf probe 1; sf read ${loadinitramfsaddr} ${qspiinitfsramloc} ${qspiinitfsramsize}

@@ -1,0 +1,4 @@
+This layer provides a custom device tree for the CMR project from Critical Link. 
+
+Main layer maintainers:
+  Daniel Vincelette <dvincelette@criticallink.com>

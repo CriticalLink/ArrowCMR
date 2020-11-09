@@ -1,0 +1,6 @@
+<library>
+  <message>Loading now from dproic.ipx</message>
+
+  <path path="ip_cores/**/*" />
+
+</library>

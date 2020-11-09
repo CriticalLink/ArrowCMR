@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system name="$${FILENAME}">
+ <component
+   name="$${FILENAME}"
+   displayName="$${FILENAME}"
+   version="1.0"
+   description=""
+   tags="INTERNAL_COMPONENT=false"
+   categories="" />
+ <parameter name="bonusData"><![CDATA[bonusData 
+{
+   element check
+   {
+      datum _sortIndex
+      {
+         value = "0";
+         type = "int";
+      }
+   }
+   element csr
+   {
+      datum _sortIndex
+      {
+         value = "1";
+         type = "int";
+      }
+   }
+   element csr2data_clock_cross
+   {
+      datum _sortIndex
+      {
+         value = "2";
+         type = "int";
+      }
+   }
+   element csr_clk
+   {
+      datum _sortIndex
+      {
+         value = "3";
+         type = "int";
+      }
+   }
+   element data_clk
+   {
+      datum _sortIndex
+      {
+         value = "4";
+         type = "int";
+      }
+   }
+   element gen
+   {
+      datum _sortIndex
+      {
+         value = "5";
+         type = "int";
+      }
+   }
+   element mem
+   {
+      datum _sortIndex
+      {
+         value = "6";
+         type = "int";
+      }
+   }
+   element rd
+   {
+      datum _sortIndex
+      {
+         value = "7";
+         type = "int";
+      }
+   }
+   element rd_dis
+   {
+      datum _sortIndex
+      {
+         value = "8";
+         type = "int";
+      }
+   }
+   element rst
+   {
+      datum _sortIndex
+      {
+         value = "9";
+         type = "int";
+      }
+   }
+   element wr
+   {
+      datum _sortIndex
+      {
+         value = "10";
+         type = "int";
+      }
+   }
+   element wr_dis
+   {
+      datum _sortIndex
+      {
+         value = "11";
+         type = "int";
+      }
+   }
+}
+]]></parameter>
+ <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
+ <parameter name="device" value="5CSXFC6C6U23C7" />
+ <parameter name="deviceFamily" value="Cyclone V" />
+ <parameter name="deviceSpeedGrade" value="7_H6" />
+ <parameter name="fabricMode" value="QSYS" />
+ <parameter name="generateLegacySim" value="false" />
+ <parameter name="generationId" value="0" />
+ <parameter name="globalResetBus" value="false" />
+ <parameter name="hdlLanguage" value="VERILOG" />
+ <parameter name="hideFromIPCatalog" value="false" />
+ <parameter name="lockedInterfaceDefinition" value="" />
+ <parameter name="maxAdditionalLatency" value="1" />
+ <parameter name="projectName" value="" />
+ <parameter name="sopcBorderPoints" value="false" />
+ <parameter name="systemHash" value="0" />
+ <parameter name="testBenchDutName" value="" />
+ <parameter name="timeStamp" value="0" />
+ <parameter name="useTestBenchNamingPattern" value="false" />
+ <instanceScript></instanceScript>
+ <interface
+   name="csr_clk_in_clk"
+   internal="csr_clk.in_clk"
+   type="clock"
+   dir="end" />
+ <interface name="csr_s0" internal="csr.s0" type="avalon" dir="end" />
+ <interface
+   name="data_clk_in_clk"
+   internal="data_clk.in_clk"
+   type="clock"
+   dir="end" />
+ <interface name="mem_m0" internal="mem.m0" type="avalon" dir="start" />
+ <interface name="reset" internal="rst.in_reset" type="reset" dir="end" />
+ <module
+   name="check"
+   kind="altera_avalon_data_pattern_checker"
+   version="18.1"
+   enabled="1">
+  <parameter name="AUTO_CSR_CLK_CLOCK_DOMAIN" value="1" />
+  <parameter name="AUTO_CSR_CLK_CLOCK_RATE" value="0" />
+  <parameter name="AUTO_CSR_CLK_RESET_DOMAIN" value="1" />
+  <parameter name="AUTO_DEVICE" value="5CSXFC6C6U23C7" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="7_H6" />
+  <parameter name="AVALON_ENABLED" value="true" />
+  <parameter name="BYPASS_ENABLED" value="false" />
+  <parameter name="CROSS_CLK_SYNC_DEPTH" value="2" />
+  <parameter name="FREQ_CNTER_ENABLED" value="false" />
+  <parameter name="NUM_CYCLES_FOR_LOCK" value="40" />
+  <parameter name="ST_DATA_W" value="128" />
+ </module>
+ <module name="csr" kind="altera_avalon_mm_bridge" version="18.1" enabled="1">
+  <parameter name="ADDRESS_UNITS" value="SYMBOLS" />
+  <parameter name="ADDRESS_WIDTH" value="10" />
+  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="LINEWRAPBURSTS" value="0" />
+  <parameter name="MAX_BURST_SIZE" value="1" />
+  <parameter name="MAX_PENDING_RESPONSES" value="4" />
+  <parameter name="PIPELINE_COMMAND" value="1" />
+  <parameter name="PIPELINE_RESPONSE" value="1" />
+  <parameter name="SYMBOL_WIDTH" value="8" />
+  <parameter name="SYSINFO_ADDR_WIDTH" value="16" />
+  <parameter name="USE_AUTO_ADDRESS_WIDTH" value="1" />
+  <parameter name="USE_RESPONSE" value="0" />
+ </module>
+ <module
+   name="csr2data_clock_cross"
+   kind="altera_avalon_mm_clock_crossing_bridge"
+   version="18.1"
+   enabled="1">
+  <parameter name="ADDRESS_UNITS" value="SYMBOLS" />
+  <parameter name="ADDRESS_WIDTH" value="10" />
+  <parameter name="COMMAND_FIFO_DEPTH" value="4" />
+  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="MASTER_SYNC_DEPTH" value="2" />
+  <parameter name="MAX_BURST_SIZE" value="1" />
+  <parameter name="RESPONSE_FIFO_DEPTH" value="4" />
+  <parameter name="SLAVE_SYNC_DEPTH" value="2" />
+  <parameter name="SYMBOL_WIDTH" value="8" />
+  <parameter name="SYSINFO_ADDR_WIDTH" value="7" />
+  <parameter name="USE_AUTO_ADDRESS_WIDTH" value="1" />
+ </module>
+ <module name="csr_clk" kind="altera_clock_bridge" version="18.1" enabled="1">
+  <parameter name="DERIVED_CLOCK_RATE" value="0" />
+  <parameter name="EXPLICIT_CLOCK_RATE" value="0" />
+  <parameter name="NUM_CLOCK_OUTPUTS" value="1" />
+ </module>
+ <module name="data_clk" kind="altera_clock_bridge" version="18.1" enabled="1">
+  <parameter name="DERIVED_CLOCK_RATE" value="0" />
+  <parameter name="EXPLICIT_CLOCK_RATE" value="0" />
+  <parameter name="NUM_CLOCK_OUTPUTS" value="1" />
+ </module>
+ <module
+   name="gen"
+   kind="altera_avalon_data_pattern_generator"
+   version="18.1"
+   enabled="1">
+  <parameter name="AUTO_CSR_CLK_CLOCK_DOMAIN" value="1" />
+  <parameter name="AUTO_CSR_CLK_CLOCK_RATE" value="0" />
+  <parameter name="AUTO_CSR_CLK_RESET_DOMAIN" value="1" />
+  <parameter name="AUTO_DEVICE" value="5CSXFC6C6U23C7" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="7_H6" />
+  <parameter name="AVALON_ENABLED" value="true" />
+  <parameter name="BYPASS_ENABLED" value="false" />
+  <parameter name="CROSS_CLK_SYNC_DEPTH" value="2" />
+  <parameter name="FREQ_CNTER_ENABLED" value="false" />
+  <parameter name="ST_DATA_W" value="128" />
+ </module>
+ <module name="mem" kind="altera_avalon_mm_bridge" version="18.1" enabled="1">
+  <parameter name="ADDRESS_UNITS" value="SYMBOLS" />
+  <parameter name="ADDRESS_WIDTH" value="10" />
+  <parameter name="DATA_WIDTH" value="128" />
+  <parameter name="LINEWRAPBURSTS" value="0" />
+  <parameter name="MAX_BURST_SIZE" value="64" />
+  <parameter name="MAX_PENDING_RESPONSES" value="4" />
+  <parameter name="PIPELINE_COMMAND" value="1" />
+  <parameter name="PIPELINE_RESPONSE" value="1" />
+  <parameter name="SYMBOL_WIDTH" value="8" />
+  <parameter name="SYSINFO_ADDR_WIDTH" value="10" />
+  <parameter name="USE_AUTO_ADDRESS_WIDTH" value="1" />
+  <parameter name="USE_RESPONSE" value="0" />
+ </module>
+ <module name="rd" kind="dma_read_master" version="18.1" enabled="1">
+  <parameter name="BURST_ENABLE" value="1" />
+  <parameter name="CHANNEL_ENABLE" value="0" />
+  <parameter name="CHANNEL_WIDTH" value="8" />
+  <parameter name="DATA_WIDTH" value="128" />
+  <parameter name="ERROR_ENABLE" value="0" />
+  <parameter name="ERROR_WIDTH" value="8" />
+  <parameter name="FIFO_DEPTH" value="1024" />
+  <parameter name="FIFO_SPEED_OPTIMIZATION" value="1" />
+  <parameter name="FIX_ADDRESS_WIDTH" value="32" />
+  <parameter name="GUI_BURST_WRAPPING_SUPPORT" value="1" />
+  <parameter name="GUI_MAX_BURST_COUNT" value="32" />
+  <parameter name="GUI_PROGRAMMABLE_BURST_ENABLE" value="0" />
+  <parameter name="GUI_STRIDE_WIDTH" value="1" />
+  <parameter name="LENGTH_WIDTH" value="32" />
+  <parameter name="PACKET_ENABLE" value="0" />
+  <parameter name="STRIDE_ENABLE" value="0" />
+  <parameter name="TRANSFER_TYPE" value="Aligned Accesses" />
+  <parameter name="USE_FIX_ADDRESS_WIDTH" value="1" />
+ </module>
+ <module
+   name="rd_dis"
+   kind="modular_sgdma_dispatcher"
+   version="18.1"
+   enabled="1">
+  <parameter name="BURST_ENABLE" value="0" />
+  <parameter name="BURST_WRAPPING_SUPPORT" value="0" />
+  <parameter name="CSR_ADDRESS_WIDTH" value="3" />
+  <parameter name="DATA_FIFO_DEPTH" value="32" />
+  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="DESCRIPTOR_FIFO_DEPTH" value="128" />
+  <parameter name="ENHANCED_FEATURES" value="1" />
+  <parameter name="GUI_RESPONSE_PORT" value="2" />
+  <parameter name="MAX_BURST_COUNT" value="2" />
+  <parameter name="MAX_BYTE" value="1024" />
+  <parameter name="MAX_STRIDE" value="1" />
+  <parameter name="MODE" value="1" />
+  <parameter name="PREFETCHER_USE_CASE" value="0" />
+  <parameter name="PROGRAMMABLE_BURST_ENABLE" value="0" />
+  <parameter name="STRIDE_ENABLE" value="0" />
+  <parameter name="TRANSFER_TYPE" value="Aligned Accesses" />
+ </module>
+ <module name="rst" kind="altera_reset_bridge" version="18.1" enabled="1">
+  <parameter name="ACTIVE_LOW_RESET" value="0" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="0" />
+  <parameter name="NUM_RESET_OUTPUTS" value="1" />
+  <parameter name="SYNCHRONOUS_EDGES" value="deassert" />
+  <parameter name="USE_RESET_REQUEST" value="0" />
+ </module>
+ <module name="wr" kind="dma_write_master" version="18.1" enabled="1">
+  <parameter name="BURST_ENABLE" value="1" />
+  <parameter name="DATA_WIDTH" value="128" />
+  <parameter name="ERROR_ENABLE" value="0" />
+  <parameter name="ERROR_WIDTH" value="8" />
+  <parameter name="FIFO_DEPTH" value="1024" />
+  <parameter name="FIFO_SPEED_OPTIMIZATION" value="1" />
+  <parameter name="FIX_ADDRESS_WIDTH" value="32" />
+  <parameter name="GUI_BURST_WRAPPING_SUPPORT" value="1" />
+  <parameter name="GUI_MAX_BURST_COUNT" value="32" />
+  <parameter name="GUI_PROGRAMMABLE_BURST_ENABLE" value="0" />
+  <parameter name="GUI_STRIDE_WIDTH" value="1" />
+  <parameter name="LENGTH_WIDTH" value="32" />
+  <parameter name="PACKET_ENABLE" value="0" />
+  <parameter name="STRIDE_ENABLE" value="0" />
+  <parameter name="TRANSFER_TYPE" value="Aligned Accesses" />
+  <parameter name="USE_FIX_ADDRESS_WIDTH" value="0" />
+ </module>
+ <module
+   name="wr_dis"
+   kind="modular_sgdma_dispatcher"
+   version="18.1"
+   enabled="1">
+  <parameter name="BURST_ENABLE" value="0" />
+  <parameter name="BURST_WRAPPING_SUPPORT" value="0" />
+  <parameter name="CSR_ADDRESS_WIDTH" value="3" />
+  <parameter name="DATA_FIFO_DEPTH" value="32" />
+  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="DESCRIPTOR_FIFO_DEPTH" value="128" />
+  <parameter name="ENHANCED_FEATURES" value="1" />
+  <parameter name="GUI_RESPONSE_PORT" value="2" />
+  <parameter name="MAX_BURST_COUNT" value="2" />
+  <parameter name="MAX_BYTE" value="1024" />
+  <parameter name="MAX_STRIDE" value="1" />
+  <parameter name="MODE" value="2" />
+  <parameter name="PREFETCHER_USE_CASE" value="0" />
+  <parameter name="PROGRAMMABLE_BURST_ENABLE" value="0" />
+  <parameter name="STRIDE_ENABLE" value="0" />
+  <parameter name="TRANSFER_TYPE" value="Aligned Accesses" />
+ </module>
+ <connection kind="avalon" version="18.1" start="rd.Data_Read_Master" end="mem.s0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="wr.Data_Write_Master"
+   end="mem.s0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="csr2data_clock_cross.m0"
+   end="rd_dis.CSR">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0020" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="csr2data_clock_cross.m0"
+   end="wr_dis.CSR">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0060" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="csr2data_clock_cross.m0"
+   end="rd_dis.Descriptor_Slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="csr2data_clock_cross.m0"
+   end="wr_dis.Descriptor_Slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0040" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="18.1" start="csr.m0" end="check.csr_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x4000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="avalon" version="18.1" start="csr.m0" end="gen.csr_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x8000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="csr.m0"
+   end="csr2data_clock_cross.s0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="rd.Data_Source"
+   end="check.pattern_in" />
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="rd_dis.Read_Command_Source"
+   end="rd.Command_Sink" />
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="rd.Response_Source"
+   end="rd_dis.Read_Response_Sink" />
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="wr.Response_Source"
+   end="wr_dis.Write_Response_Sink" />
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="wr_dis.Write_Command_Source"
+   end="wr.Command_Sink" />
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="gen.pattern_out"
+   end="wr.Data_Sink" />
+ <connection kind="clock" version="18.1" start="data_clk.out_clk" end="rd.Clock" />
+ <connection kind="clock" version="18.1" start="data_clk.out_clk" end="wr.Clock" />
+ <connection kind="clock" version="18.1" start="csr_clk.out_clk" end="csr.clk" />
+ <connection kind="clock" version="18.1" start="csr_clk.out_clk" end="rst.clk" />
+ <connection kind="clock" version="18.1" start="data_clk.out_clk" end="mem.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="data_clk.out_clk"
+   end="rd_dis.clock" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="data_clk.out_clk"
+   end="wr_dis.clock" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="csr_clk.out_clk"
+   end="check.csr_clk" />
+ <connection kind="clock" version="18.1" start="csr_clk.out_clk" end="gen.csr_clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="data_clk.out_clk"
+   end="csr2data_clock_cross.m0_clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="data_clk.out_clk"
+   end="check.pattern_in_clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="data_clk.out_clk"
+   end="gen.pattern_out_clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="csr_clk.out_clk"
+   end="csr2data_clock_cross.s0_clk" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="rst.out_reset"
+   end="rd.Clock_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="rst.out_reset"
+   end="wr.Clock_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="rst.out_reset"
+   end="rd_dis.clock_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="rst.out_reset"
+   end="wr_dis.clock_reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="rst.out_reset"
+   end="csr2data_clock_cross.m0_reset" />
+ <connection kind="reset" version="18.1" start="rst.out_reset" end="check.reset" />
+ <connection kind="reset" version="18.1" start="rst.out_reset" end="csr.reset" />
+ <connection kind="reset" version="18.1" start="rst.out_reset" end="gen.reset" />
+ <connection kind="reset" version="18.1" start="rst.out_reset" end="mem.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="rst.out_reset"
+   end="csr2data_clock_cross.s0_reset" />
+ <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
+ <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
+ <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
+ <interconnectRequirement for="$system" name="qsys_mm.maxAdditionalLatency" value="1" />
+</system>

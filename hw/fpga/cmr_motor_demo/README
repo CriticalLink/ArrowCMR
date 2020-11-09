@@ -1,0 +1,19 @@
+
+This project is the base for generating the different MitySOM-5CSx Dev Kit
+variants. The Makefile automatically compiles the project and will create a
+directory, 'stamps', for it's own use. Deleting the 'stamps' directory will
+cause the Makefile to loose track of what has and has not been built and
+everything will be rebuilt.
+
+
+To generate a project variant:
+
+Change the value of the Make variable 'SOM_MODEL' in the Makefile to a valid
+model number, and run 'make generate_from_tcl'. The other Make targets can now
+be run.
+
+
+After a project has been generated:
+
+Run 'make all' to compile the project.
+
