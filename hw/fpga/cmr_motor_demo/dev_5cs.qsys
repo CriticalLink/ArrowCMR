@@ -156,7 +156,7 @@
 }
 ]]></parameter>
  <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
- <parameter name="device" value="5CSXFC6C6U23C7" />
+ <parameter name="device" value="5CSXFC5C6U23C7" />
  <parameter name="deviceFamily" value="Cyclone V" />
  <parameter name="deviceSpeedGrade" value="7_H6" />
  <parameter name="fabricMode" value="QSYS" />
@@ -698,7 +698,7 @@
   <parameter name="desired_sdmmc_clk_mhz" value="200.0" />
   <parameter name="desired_spi_m_clk_mhz" value="200.0" />
   <parameter name="desired_usb_mp_clk_mhz" value="200.0" />
-  <parameter name="device_name" value="5CSXFC6C6U23C7" />
+  <parameter name="device_name" value="5CSXFC5C6U23C7" />
   <parameter name="device_pll_info_manual">{320000000 1600000000} {320000000 1000000000} {800000000 400000000 400000000}</parameter>
   <parameter name="eosc1_clk_mhz" value="25.0" />
   <parameter name="eosc2_clk_mhz" value="25.0" />

@@ -90,7 +90,7 @@ endif
 #  "make generate_from_tcl" for the settings
 #  to be applied.
 #
-SOM_MODEL := 5csx-h6-4ya
+SOM_MODEL := 5csx-h5-4ya
 
 
 qsys_args = --cmd="set DEVICE_TYPE $(1); set HPS_DDR_D_SIZE $(2); set HPS_DDR_A_SIZE $(3); set HPS_DDR_NUM_CHIPS $(4); set FPGA_DDR_A_SIZE $(5); set HPS_CLK_RATE $(6)"

@@ -38,7 +38,7 @@
 
 
 set_global_assignment -name FAMILY "Cyclone V"
-set_global_assignment -name DEVICE 5CSEBA4U23I7
+set_global_assignment -name DEVICE 5CSXFC5C6U23C7
 set_global_assignment -name TOP_LEVEL_ENTITY dev_5cs_top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.1
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "18:53:41  MARCH 02, 2020"
@@ -61,7 +61,7 @@ set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 7C
 set_global_assignment -name IOBANK_VCCIO 1.8V -section_id 7D
 set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 8A
 set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 3A
-##set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 5B
+set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 5B
 set_global_assignment -name IOBANK_VCCIO 3.3V -section_id 5A
 set_location_assignment PIN_W15 -to FMC3_75
 set_instance_assignment -name IO_STANDARD "3.3-V LVCMOS" -to FMC3_75
