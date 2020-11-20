@@ -111,6 +111,9 @@ void PwmIsr(uint32_t icciar, void* context) {
 	  }
 
 	  SyncEvent++;
+	  
+	  if(GetMode() == MODE4)
+	    sMcAlgorithm();
 
 	  PWM_IP_mWriteReg(PWM_IRQ_BASE, REG_IRQ_ACK, BITM_PWM_SYNC_IRQ);
 

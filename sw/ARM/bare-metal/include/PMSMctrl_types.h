@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'PMSMctrl'.
  *
- * Model version                  : 1.2742
- * Simulink Coder version         : 9.0 (R2018b) 24-May-2018
- * C/C++ source code generated on : Tue Oct 15 10:57:10 2019
+ * Model version                  : 1.2793
+ * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
+ * C/C++ source code generated on : Tue Nov 10 09:03:44 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -20,8 +20,8 @@
 #ifndef RTW_HEADER_PMSMctrl_types_h_
 #define RTW_HEADER_PMSMctrl_types_h_
 #include "rtwtypes.h"
-#ifndef DEFINED_TYPEDEF_FOR_struct_8KkQjFPVq8jPKXdFA5LRqE_
-#define DEFINED_TYPEDEF_FOR_struct_8KkQjFPVq8jPKXdFA5LRqE_
+#ifndef DEFINED_TYPEDEF_FOR_struct_RxJCGngx2NhGGMWb3mfSGE_
+#define DEFINED_TYPEDEF_FOR_struct_RxJCGngx2NhGGMWb3mfSGE_
 
 typedef struct {
   uint8_T ANAHEIM_24V;
@@ -29,31 +29,33 @@ typedef struct {
   uint8_T KOLLMORGEN_AKM22;
   uint8_T KOLLMORGEN_AKM21;
   uint8_T KINKO_SMH40S;
-} struct_8KkQjFPVq8jPKXdFA5LRqE;
+  uint8_T TEKNIC_M2310;
+} struct_RxJCGngx2NhGGMWb3mfSGE;
 
 #endif
 
 /* Custom Type definition for MATLAB Function: '<S7>/MATLAB Function4' */
-#ifndef struct_tag_sNShlJUgl7d2CkieXbBhZU
-#define struct_tag_sNShlJUgl7d2CkieXbBhZU
+#ifndef struct_tag_seyTXHTrJGkNWuaIl1qZmCE
+#define struct_tag_seyTXHTrJGkNWuaIl1qZmCE
 
-struct tag_sNShlJUgl7d2CkieXbBhZU
+struct tag_seyTXHTrJGkNWuaIl1qZmCE
 {
   uint8_T ANAHEIM_24V;
   uint8_T TEKNIC_110V;
   uint8_T KOLLMORGEN_AKM22;
   uint8_T KOLLMORGEN_AKM21;
   uint8_T KINKO_SMH40S;
+  uint8_T TEKNIC_M2310;
 };
 
-#endif                                 /*struct_tag_sNShlJUgl7d2CkieXbBhZU*/
+#endif                                 /*struct_tag_seyTXHTrJGkNWuaIl1qZmCE*/
 
-#ifndef typedef_sNShlJUgl7d2CkieXbBhZU_PMSMctrl
-#define typedef_sNShlJUgl7d2CkieXbBhZU_PMSMctrl
+#ifndef typedef_seyTXHTrJGkNWuaIl1qZmCE_PMSMctr
+#define typedef_seyTXHTrJGkNWuaIl1qZmCE_PMSMctr
 
-typedef struct tag_sNShlJUgl7d2CkieXbBhZU sNShlJUgl7d2CkieXbBhZU_PMSMctrl;
+typedef struct tag_seyTXHTrJGkNWuaIl1qZmCE seyTXHTrJGkNWuaIl1qZmCE_PMSMctr;
 
-#endif                                 /*typedef_sNShlJUgl7d2CkieXbBhZU_PMSMctrl*/
+#endif                               /*typedef_seyTXHTrJGkNWuaIl1qZmCE_PMSMctr*/
 
 /* Parameters (default storage) */
 typedef struct Parameters_PMSMctrl_ Parameters_PMSMctrl;

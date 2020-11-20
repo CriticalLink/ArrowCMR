@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'PMSMctrl'.
  *
- * Model version                  : 1.2742
- * Simulink Coder version         : 9.0 (R2018b) 24-May-2018
- * C/C++ source code generated on : Tue Oct 15 10:57:10 2019
+ * Model version                  : 1.2793
+ * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
+ * C/C++ source code generated on : Tue Nov 10 09:03:44 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -44,10 +44,10 @@ typedef struct {
   uint32_T cnt_out;                    /* '<S8>/MATLAB Function3' */
   uint32_T Gain3;                      /* '<S8>/Gain3' */
   real32_T Product1;                   /* '<S10>/Product1' */
-  real32_T y1;                         /* '<S34>/Unit  Delay' */
-  real32_T Sum1;                       /* '<S34>/Sum1' */
-  real32_T Deltau_limit;               /* '<S34>/Saturation' */
-  real32_T y;                          /* '<S34>/Sum' */
+  real32_T y1;                         /* '<S33>/Unit  Delay' */
+  real32_T Sum1;                       /* '<S33>/Sum1' */
+  real32_T Deltau_limit;               /* '<S33>/Saturation' */
+  real32_T y;                          /* '<S33>/Sum' */
   real32_T DataTypeConversion5;        /* '<S8>/Data Type Conversion5' */
   real32_T Gain6;                      /* '<S8>/Gain6' */
   real32_T Switch1;                    /* '<S10>/Switch1' */
@@ -55,30 +55,31 @@ typedef struct {
   real32_T PosLoopGain;                /* '<S10>/Pos Loop Gain' */
   real32_T Switch4;                    /* '<S10>/Switch4' */
   real32_T Sum1_n;                     /* '<S10>/Sum1' */
-  real32_T y1_d;                       /* '<S33>/Unit  Delay' */
-  real32_T Sum1_m;                     /* '<S33>/Sum1' */
-  real32_T Deltau_limit_g;             /* '<S33>/Saturation' */
-  real32_T y_i;                        /* '<S33>/Sum' */
+  real32_T y1_d;                       /* '<S32>/Unit  Delay' */
+  real32_T Sum1_m;                     /* '<S32>/Sum1' */
+  real32_T Deltau_limit_g;             /* '<S32>/Saturation' */
+  real32_T y_i;                        /* '<S32>/Sum' */
   real32_T Switch;                     /* '<S17>/Switch' */
-  real32_T MAX_RPM;                    /* '<S140>/MAX_RPM' */
+  real32_T MAX_RPM;                    /* '<S88>/MAX_RPM' */
+  real32_T Switch5;                    /* '<S14>/Switch5' */
   real32_T Switch_n;                   /* '<S14>/Switch' */
   real32_T MAX_RPM_j;                  /* '<S14>/MAX_RPM' */
   real32_T Product1_b;                 /* '<S14>/Product1' */
   real32_T DataTypeConversion;         /* '<S14>/Data Type Conversion' */
-  real32_T y1_h;                       /* '<S39>/Unit  Delay' */
-  real32_T Sum1_j;                     /* '<S39>/Sum1' */
-  real32_T Deltau_limit_h;             /* '<S39>/Saturation' */
+  real32_T y1_h;                       /* '<S38>/Unit  Delay' */
+  real32_T Sum1_j;                     /* '<S38>/Sum1' */
+  real32_T Deltau_limit_h;             /* '<S38>/Saturation' */
   real32_T Abs;                        /* '<S15>/Abs' */
   real32_T DataTypeConversion5_j;      /* '<S7>/Data Type Conversion5' */
   real32_T Switch3;                    /* '<S15>/Switch3' */
   real32_T Sum2;                       /* '<S14>/Sum2' */
-  real32_T ProportionalGain;           /* '<S113>/Proportional Gain' */
-  real32_T Integrator;                 /* '<S96>/Integrator' */
-  real32_T DerivativeGain;             /* '<S73>/Derivative Gain' */
-  real32_T Filter;                     /* '<S78>/Filter' */
-  real32_T SumD;                       /* '<S78>/SumD' */
-  real32_T FilterCoefficient;          /* '<S106>/Filter Coefficient' */
-  real32_T Sum_i;                      /* '<S126>/Sum' */
+  real32_T ProportionalGain;           /* '<S76>/Proportional Gain' */
+  real32_T Integrator;                 /* '<S71>/Integrator' */
+  real32_T DerivativeGain;             /* '<S65>/Derivative Gain' */
+  real32_T Filter;                     /* '<S66>/Filter' */
+  real32_T SumD;                       /* '<S66>/SumD' */
+  real32_T FilterCoefficient;          /* '<S74>/Filter Coefficient' */
+  real32_T Sum_i;                      /* '<S80>/Sum' */
   real32_T TmpSignalConversionAtSFunctionI[2];
   real32_T DataTypeConversion7[2];     /* '<S8>/Data Type Conversion7' */
   real32_T Sum4[2];                    /* '<S8>/Sum4' */
@@ -95,14 +96,14 @@ typedef struct {
   real32_T DataTypeConversion1_h;      /* '<S3>/Data Type Conversion1' */
   real32_T sine_cosine2_o1;            /* '<S3>/sine_cosine2' */
   real32_T sine_cosine2_o2;            /* '<S3>/sine_cosine2' */
-  real32_T Product;                    /* '<S141>/Product' */
-  real32_T Product1_i;                 /* '<S141>/Product1' */
-  real32_T sinwt2pi3;                  /* '<S141>/Sum' */
-  real32_T Product3;                   /* '<S141>/Product3' */
-  real32_T Product2;                   /* '<S141>/Product2' */
-  real32_T coswt2pi3;                  /* '<S141>/Sum1' */
-  real32_T sinwt2pi3_m;                /* '<S141>/Sum2' */
-  real32_T coswt2pi3_g;                /* '<S141>/Sum3' */
+  real32_T Product;                    /* '<S89>/Product' */
+  real32_T Product1_i;                 /* '<S89>/Product1' */
+  real32_T sinwt2pi3;                  /* '<S89>/Sum' */
+  real32_T Product3;                   /* '<S89>/Product3' */
+  real32_T Product2;                   /* '<S89>/Product2' */
+  real32_T coswt2pi3;                  /* '<S89>/Sum1' */
+  real32_T sinwt2pi3_m;                /* '<S89>/Sum2' */
+  real32_T coswt2pi3_g;                /* '<S89>/Sum3' */
   real32_T VectorConcatenate[2];       /* '<S18>/Vector Concatenate' */
   real32_T Memory[3];                  /* '<S18>/Memory' */
   real32_T Gain2_m[3];                 /* '<S18>/Gain2' */
@@ -128,78 +129,79 @@ typedef struct {
   real32_T Saturation[3];              /* '<S9>/Saturation' */
   real32_T DataTypeConversion1_j;      /* '<S8>/Data Type Conversion1' */
   real32_T Sum2_h;                     /* '<S8>/Sum2' */
-  real32_T ZeroGain;                   /* '<S69>/ZeroGain' */
-  real32_T DeadZone;                   /* '<S69>/DeadZone' */
-  real32_T SignPreSat;                 /* '<S69>/SignPreSat' */
-  real32_T IntegralGain;               /* '<S86>/Integral Gain' */
-  real32_T SignPreIntegrator;          /* '<S69>/SignPreIntegrator' */
-  real32_T Switch_b;                   /* '<S69>/Switch' */
-  real32_T Sum4_d;                     /* '<S141>/Sum4' */
-  real32_T Gain1;                      /* '<S141>/Gain1' */
+  real32_T ZeroGain;                   /* '<S64>/ZeroGain' */
+  real32_T DeadZone;                   /* '<S64>/DeadZone' */
+  real32_T SignPreSat;                 /* '<S64>/SignPreSat' */
+  real32_T IntegralGain;               /* '<S68>/Integral Gain' */
+  real32_T SignPreIntegrator;          /* '<S64>/SignPreIntegrator' */
+  real32_T Switch_b;                   /* '<S64>/Switch' */
+  real32_T Switch4_b;                  /* '<S14>/Switch4' */
+  real32_T Sum4_d;                     /* '<S89>/Sum4' */
+  real32_T Gain1;                      /* '<S89>/Gain1' */
   real32_T SYS_CMD1;                   /* '<S1>/SYS_CMD1' */
   real32_T vector_lim[3];              /* '<S16>/MATLAB Function1' */
   real32_T Switch1_o[3];               /* '<S16>/Switch1' */
   real32_T DataTypeConversion_m;       /* '<S17>/Data Type Conversion' */
   real32_T gain2;                      /* '<S17>/gain2' */
   real32_T Gain_b[2];                  /* '<S18>/Gain' */
-  real32_T Switch4_b;                  /* '<S15>/Switch4' */
-  real32_T y_e;                        /* '<S14>/MATLAB Function' */
-  real32_T Saturation_b;               /* '<S117>/Saturation' */
+  real32_T Switch4_bi;                 /* '<S15>/Switch4' */
+  real32_T y_o;                        /* '<S14>/MATLAB Function' */
+  real32_T Saturation_b;               /* '<S78>/Saturation' */
+  real32_T Switch1_a;                  /* '<S14>/Switch1' */
   real32_T Gain3_p;                    /* '<S13>/Gain3' */
-  real32_T DiscreteStateSpace;         /* '<S35>/Discrete State-Space' */
-  real32_T y_ej;                       /* '<S13>/MATLAB Function1' */
+  real32_T DiscreteStateSpace;         /* '<S34>/Discrete State-Space' */
+  real32_T y_oa;                       /* '<S13>/MATLAB Function1' */
   real32_T ManualSwitch;               /* '<S1>/Manual Switch' */
   real32_T pos_multi;                  /* '<S8>/MATLAB Function2' */
-  real32_T y_k[2];                     /* '<S8>/MATLAB Function1' */
-  real32_T y_d;                        /* '<S7>/MATLAB Function4' */
+  real32_T y_j[2];                     /* '<S8>/MATLAB Function1' */
+  real32_T y_k;                        /* '<S7>/MATLAB Function4' */
   real32_T Sum4_dt;                    /* '<S7>/Sum4' */
   real32_T Sum3_n;                     /* '<S7>/Sum3' */
   int32_T Product_i;                   /* '<S17>/Product' */
   int32_T DataTypeConversion6;         /* '<S8>/Data Type Conversion6' */
-  int32_T Gain1_j;                     /* '<S140>/Gain1' */
-  int32_T UnitDelay1;                  /* '<S140>/Unit Delay1' */
-  int32_T Sum2_p;                      /* '<S140>/Sum2' */
-  int32_T VF_MAX_RATE;                 /* '<S140>/VF_MAX_RATE' */
-  int32_T Sum4_o;                      /* '<S140>/Sum4' */
+  int32_T Gain1_j;                     /* '<S88>/Gain1' */
+  int32_T UnitDelay1;                  /* '<S88>/Unit Delay1' */
+  int32_T Sum2_p;                      /* '<S88>/Sum2' */
+  int32_T VF_MAX_RATE;                 /* '<S88>/VF_MAX_RATE' */
+  int32_T Sum4_o;                      /* '<S88>/Sum4' */
   int32_T Product1_g;                  /* '<S17>/Product1' */
   int32_T DataTypeConversion_f;        /* '<S18>/Data Type Conversion' */
   int32_T Memory1[2];                  /* '<S18>/Memory1' */
   int32_T dq_is_lim[2];                /* '<S16>/MATLAB Function1' */
   uint16_T VF_BOOST;                   /* '<S1>/VF_BOOST' */
-  uint16_T DataTypeConversion3;        /* '<S8>/Data Type Conversion3' */
   uint16_T Switch1_e;                  /* '<S7>/Switch1' */
   uint16_T DataTypeConversion_n[3];    /* '<S9>/Data Type Conversion' */
   uint16_T Switch1_ou;                 /* '<S17>/Switch1' */
-  uint16_T y_g;                        /* '<S7>/MATLAB Function' */
+  uint16_T y_i5;                       /* '<S7>/MATLAB Function' */
   uint16_T DataTypeConversion4;        /* '<S8>/Data Type Conversion4' */
   uint16_T Sum1_p;                     /* '<S7>/Sum1' */
   uint16_T Sum2_l;                     /* '<S7>/Sum2' */
   uint16_T Sum5;                       /* '<S7>/Sum5' */
-  int16_T Gain_h;                      /* '<S139>/Gain' */
+  int16_T Gain_h;                      /* '<S87>/Gain' */
   int16_T Sum5_p[3];                   /* '<S8>/Sum5' */
   int16_T Sum_a;                       /* '<S17>/Sum' */
   int16_T VF_GAIN;                     /* '<S1>/VF_GAIN' */
   int16_T ROT_DIR;                     /* '<S1>/ROT_DIR' */
   int16_T Switch2_f;                   /* '<S10>/Switch2' */
   int16_T VF_CTRL;                     /* '<S1>/VF_CTRL' */
-  int16_T Gain2_d;                     /* '<S140>/Gain2' */
+  int16_T Gain2_d;                     /* '<S88>/Gain2' */
   int16_T Switch3_h;                   /* '<S14>/Switch3' */
   int16_T Switch2_g;                   /* '<S17>/Switch2' */
-  int16_T Gain1_f;                     /* '<S139>/Gain1' */
-  int16_T UnitDelay;                   /* '<S139>/Unit Delay' */
-  int16_T Sum1_m1;                     /* '<S139>/Sum1' */
+  int16_T Gain1_f;                     /* '<S87>/Gain1' */
+  int16_T UnitDelay;                   /* '<S87>/Unit Delay' */
+  int16_T Sum1_m1;                     /* '<S87>/Sum1' */
   int16_T Switch2_fn;                  /* '<S14>/Switch2' */
   int16_T Switch2_b;                   /* '<S11>/Switch2' */
-  int16_T y_gd[3];                     /* '<S8>/MATLAB Function' */
+  int16_T y_a[3];                      /* '<S8>/MATLAB Function' */
   uint8_T Compare;                     /* '<S6>/Compare' */
   uint8_T Compare_l;                   /* '<S5>/Compare' */
   uint8_T Compare_p;                   /* '<S4>/Compare' */
   uint8_T SYS_CMD2;                    /* '<S1>/SYS_CMD2' */
-  int8_T DataTypeConv1;                /* '<S69>/DataTypeConv1' */
-  int8_T DataTypeConv2;                /* '<S69>/DataTypeConv2' */
-  boolean_T NotEqual;                  /* '<S69>/NotEqual' */
-  boolean_T Equal1;                    /* '<S69>/Equal1' */
-  boolean_T AND3;                      /* '<S69>/AND3' */
+  int8_T DataTypeConv1;                /* '<S64>/DataTypeConv1' */
+  int8_T DataTypeConv2;                /* '<S64>/DataTypeConv2' */
+  boolean_T NotEqual;                  /* '<S64>/NotEqual' */
+  boolean_T Equal1;                    /* '<S64>/Equal1' */
+  boolean_T AND3;                      /* '<S64>/AND3' */
 } BlockIO_PMSMctrl;
 
 /* Block states (default storage) for system '<Root>' */
@@ -208,24 +210,25 @@ typedef struct {
     void *LoggedData[2];
   } Scope2_PWORK;                      /* '<S15>/Scope2' */
 
-  real32_T UnitDelay_DSTATE;           /* '<S34>/Unit  Delay' */
-  real32_T UnitDelay_DSTATE_i;         /* '<S33>/Unit  Delay' */
-  real32_T UnitDelay_DSTATE_e;         /* '<S39>/Unit  Delay' */
+  real32_T UnitDelay_DSTATE;           /* '<S33>/Unit  Delay' */
+  real32_T UnitDelay_DSTATE_i;         /* '<S32>/Unit  Delay' */
+  real32_T UnitDelay_DSTATE_e;         /* '<S38>/Unit  Delay' */
   real32_T DiscreteStateSpace_DSTATE;  /* '<S20>/Discrete State-Space' */
-  real32_T Integrator_DSTATE;          /* '<S96>/Integrator' */
-  real32_T Filter_DSTATE;              /* '<S78>/Filter' */
-  real32_T DiscreteStateSpace_DSTATE_f;/* '<S35>/Discrete State-Space' */
-  int32_T UnitDelay1_DSTATE;           /* '<S140>/Unit Delay1' */
+  real32_T Integrator_DSTATE;          /* '<S71>/Integrator' */
+  real32_T Filter_DSTATE;              /* '<S66>/Filter' */
+  real32_T DiscreteStateSpace_DSTATE_f;/* '<S34>/Discrete State-Space' */
+  int32_T UnitDelay1_DSTATE;           /* '<S88>/Unit Delay1' */
   real32_T RateTransition1_Buffer0;    /* '<S1>/Rate Transition1' */
   real32_T Memory_PreviousInput[3];    /* '<S18>/Memory' */
+  real32_T RateTransition1_Buffer;     /* '<S2>/Rate Transition1' */
   real32_T RateTransition2_Buffer0;    /* '<S1>/Rate Transition2' */
   real32_T old_sign;                   /* '<S13>/MATLAB Function1' */
   real32_T u_old;                      /* '<S13>/MATLAB Function' */
   real32_T CurOff[2];                  /* '<S8>/MATLAB Function1' */
   real32_T ia_acc;                     /* '<S8>/MATLAB Function1' */
   real32_T ib_acc;                     /* '<S8>/MATLAB Function1' */
-  real32_T ia_acc_i;                   /* '<S8>/MATLAB Function' */
-  real32_T ib_acc_m;                   /* '<S8>/MATLAB Function' */
+  real32_T ia_acc_m;                   /* '<S8>/MATLAB Function' */
+  real32_T ib_acc_j;                   /* '<S8>/MATLAB Function' */
   real32_T ic_acc;                     /* '<S8>/MATLAB Function' */
   real32_T AngleTable[6];              /* '<S7>/MATLAB Function4' */
   real32_T AngleStartTable[6];         /* '<S7>/MATLAB Function4' */
@@ -236,23 +239,24 @@ typedef struct {
   int32_T Sum_DWORK1;                  /* '<S17>/Sum' */
   int32_T turn_cnt;                    /* '<S8>/MATLAB Function2' */
   uint32_T cnt_old;                    /* '<S8>/MATLAB Function2' */
-  int16_T UnitDelay_DSTATE_h;          /* '<S139>/Unit Delay' */
+  int16_T UnitDelay_DSTATE_h;          /* '<S87>/Unit Delay' */
   int16_T Sum4_DWORK1[2];              /* '<S8>/Sum4' */
   int16_T sample;                      /* '<S8>/MATLAB Function1' */
-  int16_T CurOff_m[3];                 /* '<S8>/MATLAB Function' */
-  int16_T sample_b;                    /* '<S8>/MATLAB Function' */
-  uint16_T sample_count;               /* '<S14>/MATLAB Function1' */
+  int16_T CurOff_p[3];                 /* '<S8>/MATLAB Function' */
+  int16_T sample_o;                    /* '<S8>/MATLAB Function' */
+  uint16_T sample_count;               /* '<S14>/MATLAB Function2' */
+  uint16_T sample_count_f;             /* '<S14>/MATLAB Function1' */
   uint16_T OffsetState;                /* '<S7>/MATLAB Function4' */
   uint16_T HallIn;                     /* '<S7>/MATLAB Function4' */
-  uint16_T AngleTable_h[6];            /* '<S7>/MATLAB Function' */
-  uint16_T AngleStartTable_n[6];       /* '<S7>/MATLAB Function' */
-  uint16_T OffsetState_g;              /* '<S7>/MATLAB Function' */
+  uint16_T AngleTable_m[6];            /* '<S7>/MATLAB Function' */
+  uint16_T AngleStartTable_i[6];       /* '<S7>/MATLAB Function' */
+  uint16_T OffsetState_b;              /* '<S7>/MATLAB Function' */
   uint16_T AbsAngle_d;                 /* '<S7>/MATLAB Function' */
-  uint16_T HallIn_j;                   /* '<S7>/MATLAB Function' */
-  int8_T Integrator_PrevResetState;    /* '<S96>/Integrator' */
-  int8_T Filter_PrevResetState;        /* '<S78>/Filter' */
+  uint16_T HallIn_m;                   /* '<S7>/MATLAB Function' */
+  int8_T Integrator_PrevResetState;    /* '<S71>/Integrator' */
+  int8_T Filter_PrevResetState;        /* '<S66>/Filter' */
   uint8_T SysCmd_old;                  /* '<S8>/MATLAB Function1' */
-  uint8_T SysCmd_old_o;                /* '<S8>/MATLAB Function' */
+  uint8_T SysCmd_old_m;                /* '<S8>/MATLAB Function' */
   uint8_T pos_rst_old;                 /* '<S7>/MATLAB Function3' */
   boolean_T u_old_not_empty;           /* '<S13>/MATLAB Function' */
   boolean_T AngleTable_not_empty;      /* '<S7>/MATLAB Function4' */
@@ -271,12 +275,13 @@ typedef struct {
    *   '<S8>/sinc_cmd'
    *   '<S8>/Switch1'
    *   '<S14>/Manual Switch'
+   *   '<S14>/Manual Switch1'
    *   '<S16>/Switch1'
    *   '<S16>/Switch2'
    *   '<S17>/Switch'
    *   '<S17>/Switch1'
    */
-  uint8_T pooled20;
+  uint8_T pooled21;
 } ConstParam_PMSMctrl;
 
 /* External inputs (root inport signals with default storage) */
@@ -302,10 +307,10 @@ typedef struct {
 /* Parameters (default storage) */
 struct Parameters_PMSMctrl_ {
   real32_T Kiw;                        /* Variable: Kiw
-                                        * Referenced by: '<S86>/Integral Gain'
+                                        * Referenced by: '<S68>/Integral Gain'
                                         */
   real32_T Kpw;                        /* Variable: Kpw
-                                        * Referenced by: '<S113>/Proportional Gain'
+                                        * Referenced by: '<S76>/Proportional Gain'
                                         */
   real32_T MBC_ID;                     /* Variable: MBC_ID
                                         * Referenced by: '<S1>/SYS_CMD1'
@@ -317,10 +322,10 @@ struct Parameters_PMSMctrl_ {
                                         * Referenced by: '<S1>/SPEED_REF2'
                                         */
   real32_T SpdSlewRateNeg;             /* Variable: SpdSlewRateNeg
-                                        * Referenced by: '<S39>/Saturation'
+                                        * Referenced by: '<S38>/Saturation'
                                         */
   real32_T SpdSlewRatePos;             /* Variable: SpdSlewRatePos
-                                        * Referenced by: '<S39>/Saturation'
+                                        * Referenced by: '<S38>/Saturation'
                                         */
   real32_T iabcOffset[3];              /* Variable: iabcOffset
                                         * Referenced by: '<S8>/Constant'
@@ -330,13 +335,13 @@ struct Parameters_PMSMctrl_ {
                                         */
   real32_T iqMax;                      /* Variable: iqMax
                                         * Referenced by:
-                                        *   '<S69>/DeadZone'
-                                        *   '<S117>/Saturation'
+                                        *   '<S64>/DeadZone'
+                                        *   '<S78>/Saturation'
                                         */
   real32_T iqMin;                      /* Variable: iqMin
                                         * Referenced by:
-                                        *   '<S69>/DeadZone'
-                                        *   '<S117>/Saturation'
+                                        *   '<S64>/DeadZone'
+                                        *   '<S78>/Saturation'
                                         */
   real32_T vdcOffset;                  /* Variable: vdcOffset
                                         * Referenced by: '<S8>/Constant1'
@@ -348,13 +353,13 @@ struct Parameters_PMSMctrl_ {
                                         * Referenced by:
                                         *   '<S10>/MAX_RPM'
                                         *   '<S14>/MAX_RPM'
-                                        *   '<S140>/MAX_RPM'
+                                        *   '<S88>/MAX_RPM'
                                         */
   int16_T SPEED_REF;                   /* Variable: SPEED_REF
                                         * Referenced by: '<S1>/SPEED_REF'
                                         */
   int8_T VF_MAX_RATE;                  /* Variable: VF_MAX_RATE
-                                        * Referenced by: '<S140>/VF_MAX_RATE'
+                                        * Referenced by: '<S88>/VF_MAX_RATE'
                                         */
   uint8_T MOTOR_CFG;                   /* Variable: MOTOR_CFG
                                         * Referenced by: '<S1>/SYS_CMD2'
@@ -429,7 +434,8 @@ extern real32_T theta_enc_mul;         /* '<S7>/Gain3' */
 extern real32_T speed_ff;              /* '<S1>/SPEED_REF2' */
 extern real32_T Nref;                  /* '<S10>/MAX_RPM' */
 extern real32_T speed_ref;             /* '<S11>/Switch3' */
-extern real32_T speed_ref_lim;         /* '<S39>/Sum' */
+extern real32_T w_ref;                 /* '<S14>/Manual Switch1' */
+extern real32_T speed_ref_lim;         /* '<S38>/Sum' */
 extern real32_T spd_fil_calc;          /* '<S1>/Rate Transition1' */
 extern real32_T spd_raw_n_by_m;        /* '<S7>/Product1' */
 extern real32_T spd_fil_n_by_m;        /* '<S20>/Discrete State-Space' */
@@ -437,27 +443,29 @@ extern real32_T spd_raw_n_by_1;        /* '<S7>/Product3' */
 extern real32_T spd_fil_n_by_1;        /* '<S7>/Gain4' */
 extern real32_T speed_fil;             /* '<S15>/Switch2' */
 extern real32_T iq_ref;                /* '<S14>/Manual Switch' */
-extern real32_T theta_vf;              /* '<S139>/Data Type Conversion' */
+extern real32_T theta_vf;              /* '<S87>/Data Type Conversion' */
 extern real32_T theta_enc;             /* '<S7>/Gain1' */
-extern real32_T id;                    /* '<S141>/Fcn2' */
-extern real32_T iq;                    /* '<S141>/Fcn1' */
-extern real32_T theta_speed;           /* '<S2>/Rate Transition1' */
+extern real32_T id;                    /* '<S89>/Fcn2' */
+extern real32_T iq;                    /* '<S89>/Fcn1' */
 extern real32_T n_by_m_fil_debug;      /* '<S7>/Gain10' */
 extern real32_T n_by_m_raw_debug;      /* '<S7>/Gain2' */
-extern real32_T ia_sar;                /* '<S31>/Gain3' */
-extern real32_T ib_sar;                /* '<S31>/Gain6' */
-extern real32_T ic_sar;                /* '<S31>/Gain7' */
-extern real32_T ic_sinc;               /* '<S32>/Gain10' */
-extern real32_T ia_sinc;               /* '<S32>/Gain8' */
-extern real32_T ib_sinc;               /* '<S32>/Gain9' */
+extern real32_T ia_sar;                /* '<S30>/Gain3' */
+extern real32_T ib_sar;                /* '<S30>/Gain6' */
+extern real32_T ic_sar;                /* '<S30>/Gain7' */
+extern real32_T ic_sinc;               /* '<S31>/Gain10' */
+extern real32_T ia_sinc;               /* '<S31>/Gain8' */
+extern real32_T ib_sinc;               /* '<S31>/Gain9' */
 extern real32_T Vdc;                   /* '<S8>/Gain1' */
 extern real32_T spd_raw_calc;          /* '<S1>/Rate Transition2' */
 extern real32_T speed_raw;             /* '<S15>/Switch1' */
+extern real32_T theta_speed;           /* '<S2>/Rate Transition1' */
+extern real32_T w_step;                /* '<S14>/MATLAB Function2' */
 extern real32_T iq_ref_step;           /* '<S14>/MATLAB Function1' */
 extern real32_T speed_debug;           /* '<S13>/MATLAB Function' */
 extern real32_T pos_offset;            /* '<S7>/MATLAB Function3' */
 extern real32_T speed_meas_raw_n_by_1; /* '<S7>/MATLAB Function2' */
 extern real32_T speed_meas_raw_n_by_m; /* '<S7>/MATLAB Function1' */
+extern uint16_T theta_qep_cnt;         /* '<S8>/Data Type Conversion3' */
 
 /* Model entry point functions */
 extern void PMSMctrl_initialize(void);
@@ -514,18 +522,18 @@ extern RT_MODEL_PMSMctrl *const PMSMctrl_M;
  * '<S27>'  : 'CM40xPMSM/PMSMctrl/InputScaling/MATLAB Function1'
  * '<S28>'  : 'CM40xPMSM/PMSMctrl/InputScaling/MATLAB Function2'
  * '<S29>'  : 'CM40xPMSM/PMSMctrl/InputScaling/MATLAB Function3'
- * '<S30>'  : 'CM40xPMSM/PMSMctrl/InputScaling/MATLAB Function4'
- * '<S31>'  : 'CM40xPMSM/PMSMctrl/InputScaling/Subsystem'
- * '<S32>'  : 'CM40xPMSM/PMSMctrl/InputScaling/Subsystem1'
- * '<S33>'  : 'CM40xPMSM/PMSMctrl/Position Controller/Discrete Rate Limiter1'
- * '<S34>'  : 'CM40xPMSM/PMSMctrl/Position Controller/Discrete Rate Limiter2'
- * '<S35>'  : 'CM40xPMSM/PMSMctrl/SpeedCalc/Discrete 1st-Order Filter'
- * '<S36>'  : 'CM40xPMSM/PMSMctrl/SpeedCalc/MATLAB Function'
- * '<S37>'  : 'CM40xPMSM/PMSMctrl/SpeedCalc/MATLAB Function1'
- * '<S38>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2'
- * '<S39>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete Rate Limiter2'
- * '<S40>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/MATLAB Function'
- * '<S41>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/MATLAB Function1'
+ * '<S30>'  : 'CM40xPMSM/PMSMctrl/InputScaling/Subsystem'
+ * '<S31>'  : 'CM40xPMSM/PMSMctrl/InputScaling/Subsystem1'
+ * '<S32>'  : 'CM40xPMSM/PMSMctrl/Position Controller/Discrete Rate Limiter1'
+ * '<S33>'  : 'CM40xPMSM/PMSMctrl/Position Controller/Discrete Rate Limiter2'
+ * '<S34>'  : 'CM40xPMSM/PMSMctrl/SpeedCalc/Discrete 1st-Order Filter'
+ * '<S35>'  : 'CM40xPMSM/PMSMctrl/SpeedCalc/MATLAB Function'
+ * '<S36>'  : 'CM40xPMSM/PMSMctrl/SpeedCalc/MATLAB Function1'
+ * '<S37>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2'
+ * '<S38>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete Rate Limiter2'
+ * '<S39>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/MATLAB Function'
+ * '<S40>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/MATLAB Function1'
+ * '<S41>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/MATLAB Function2'
  * '<S42>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup'
  * '<S43>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/D Gain'
  * '<S44>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter'
@@ -548,84 +556,32 @@ extern RT_MODEL_PMSMctrl *const PMSMctrl_M;
  * '<S61>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Tracking Mode Sum'
  * '<S62>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/postSat Signal'
  * '<S63>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/preSat Signal'
- * '<S64>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Back Calculation'
- * '<S65>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Cont. Clamping Ideal'
- * '<S66>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Cont. Clamping Parallel'
- * '<S67>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Disabled'
- * '<S68>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Disc. Clamping Ideal'
- * '<S69>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Disc. Clamping Parallel'
- * '<S70>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Passthrough'
- * '<S71>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/D Gain/Disabled'
- * '<S72>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/D Gain/External Parameters'
- * '<S73>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/D Gain/Internal Parameters'
- * '<S74>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter/Cont. Filter'
- * '<S75>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter/Differentiator'
- * '<S76>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter/Disabled'
- * '<S77>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter/Disc. Backward Euler Filter'
- * '<S78>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter/Disc. Forward Euler Filter'
- * '<S79>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter/Disc. Trapezoidal Filter'
- * '<S80>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter ICs/Disabled'
- * '<S81>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter ICs/External IC'
- * '<S82>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter ICs/Internal IC - Differentiator'
- * '<S83>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter ICs/Internal IC - Filter'
- * '<S84>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/I Gain/Disabled'
- * '<S85>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/I Gain/External Parameters'
- * '<S86>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/I Gain/Internal Parameters'
- * '<S87>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain/External Parameters'
- * '<S88>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain/Internal Parameters'
- * '<S89>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain/Passthrough'
- * '<S90>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain Fdbk/Disabled'
- * '<S91>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain Fdbk/External Parameters'
- * '<S92>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain Fdbk/Internal Parameters'
- * '<S93>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain Fdbk/Passthrough'
- * '<S94>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator/Continuous'
- * '<S95>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator/Disabled'
- * '<S96>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator/Discrete'
- * '<S97>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator ICs/Disabled'
- * '<S98>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator ICs/External IC'
- * '<S99>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator ICs/Internal IC'
- * '<S100>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Copy/Disabled'
- * '<S101>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Copy/Disabled wSignal Specification'
- * '<S102>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Copy/External Parameters'
- * '<S103>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Copy/Internal Parameters'
- * '<S104>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Gain/Disabled'
- * '<S105>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Gain/External Parameters'
- * '<S106>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Gain/Internal Parameters'
- * '<S107>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Gain/Passthrough'
- * '<S108>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/P Copy/Disabled'
- * '<S109>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/P Copy/External Parameters Ideal'
- * '<S110>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/P Copy/Internal Parameters Ideal'
- * '<S111>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Parallel P Gain/Disabled'
- * '<S112>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Parallel P Gain/External Parameters'
- * '<S113>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Parallel P Gain/Internal Parameters'
- * '<S114>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Parallel P Gain/Passthrough'
- * '<S115>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Reset Signal/Disabled'
- * '<S116>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Reset Signal/External Reset'
- * '<S117>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Saturation/Enabled'
- * '<S118>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Saturation/Passthrough'
- * '<S119>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Saturation Fdbk/Disabled'
- * '<S120>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Saturation Fdbk/Enabled'
- * '<S121>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Saturation Fdbk/Passthrough'
- * '<S122>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum/Passthrough_I'
- * '<S123>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum/Passthrough_P'
- * '<S124>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum/Sum_PD'
- * '<S125>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum/Sum_PI'
- * '<S126>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum/Sum_PID'
- * '<S127>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum Fdbk/Disabled'
- * '<S128>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum Fdbk/Enabled'
- * '<S129>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum Fdbk/Passthrough'
- * '<S130>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Tracking Mode/Disabled'
- * '<S131>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Tracking Mode/Enabled'
- * '<S132>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Tracking Mode Sum/Passthrough'
- * '<S133>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Tracking Mode Sum/Tracking Mode'
- * '<S134>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/postSat Signal/Feedback_Path'
- * '<S135>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/postSat Signal/Forward_Path'
- * '<S136>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/preSat Signal/Feedback_Path'
- * '<S137>' : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/preSat Signal/Forward_Path'
- * '<S138>' : 'CM40xPMSM/PMSMctrl/Switch/MATLAB Function1'
- * '<S139>' : 'CM40xPMSM/PMSMctrl/VFCtrl/AngCalc'
- * '<S140>' : 'CM40xPMSM/PMSMctrl/VFCtrl/RefCtrl'
- * '<S141>' : 'CM40xPMSM/PMSMctrl/VectorControl/abc_to_dq2'
+ * '<S64>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Anti-windup/Disc. Clamping Parallel'
+ * '<S65>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/D Gain/Internal Parameters'
+ * '<S66>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter/Disc. Forward Euler Filter'
+ * '<S67>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Filter ICs/Internal IC - Filter'
+ * '<S68>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/I Gain/Internal Parameters'
+ * '<S69>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain/Passthrough'
+ * '<S70>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Ideal P Gain Fdbk/Disabled'
+ * '<S71>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator/Discrete'
+ * '<S72>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Integrator ICs/Internal IC'
+ * '<S73>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Copy/Disabled'
+ * '<S74>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/N Gain/Internal Parameters'
+ * '<S75>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/P Copy/Disabled'
+ * '<S76>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Parallel P Gain/Internal Parameters'
+ * '<S77>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Reset Signal/External Reset'
+ * '<S78>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Saturation/Enabled'
+ * '<S79>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Saturation Fdbk/Disabled'
+ * '<S80>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum/Sum_PID'
+ * '<S81>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Sum Fdbk/Disabled'
+ * '<S82>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Tracking Mode/Disabled'
+ * '<S83>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/Tracking Mode Sum/Passthrough'
+ * '<S84>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/postSat Signal/Forward_Path'
+ * '<S85>'  : 'CM40xPMSM/PMSMctrl/SpeedControl/Discrete PID Controller2/preSat Signal/Forward_Path'
+ * '<S86>'  : 'CM40xPMSM/PMSMctrl/Switch/MATLAB Function1'
+ * '<S87>'  : 'CM40xPMSM/PMSMctrl/VFCtrl/AngCalc'
+ * '<S88>'  : 'CM40xPMSM/PMSMctrl/VFCtrl/RefCtrl'
+ * '<S89>'  : 'CM40xPMSM/PMSMctrl/VectorControl/abc_to_dq2'
  */
 #endif                                 /* RTW_HEADER_PMSMctrl_h_ */
 

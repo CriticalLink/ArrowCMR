@@ -69,7 +69,6 @@ uint32_t SINC_FLUSH_TRIP_IP_mReadReg(uint32_t base, uint32_t offset) {
 }
 
 /*=============  P R O T O T Y P E S  =============*/
-void SetupSINC(void);
 void SetupSincDataIrq(void);
 
 /*=============  D A T A  =============*/
@@ -110,14 +109,15 @@ void SincDataIsr(uint32_t icciar, void* context){
 	  sinc1_synced = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_DATA_SYNCED);
 	  sinc0_synced = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_DATA_SYNCED);
 
-	  sinc0_trip_fil_out = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_TRIP_FIL_OUT); // Just for debugging. Not used for anyhting
-	  sinc1_trip_fil_out = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_TRIP_FIL_OUT); // Just for debugging. Not used for anyhting
+	  sinc0_trip_fil_out = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_TRIP_FIL_OUT); // Just for debugging. Not used for anything
+	  sinc1_trip_fil_out = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_TRIP_FIL_OUT); // Just for debugging. Not used for anything
 
-	  sinc0_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_TRIP); // Just for debugging. Not used for anyhting
-	  sinc1_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_TRIP); // Just for debugging. Not used for anyhting
+	  sinc0_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_TRIP); // Just for debugging. Not used for anything
+	  sinc1_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_TRIP); // Just for debugging. Not used for anything
 	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT15, 0);
 
-	  sMcAlgorithm();
+	  if(GetMode() != MODE4)
+	    sMcAlgorithm();
 
       // Clear IRQ before we leave, as sMcAlgorithm call takes a long time and IRQ may reset before we exit, which can starve other IRQs
       SINC_FLUSH_TRIP_IP_mWriteReg(SINC_DATA_IRQ_BASE, REG_IRQ_ACK, BITM_SINC0_DATA_IRQ);
@@ -145,21 +145,22 @@ void aMeasureInit(void){
   Notes: Setup of Measurement system.
 
 *****************************************************************************/
-  SetupSINC();
+  SetupSincOptFlush();
   SetupSincDataIrq();
 }
 
-void SetupSINC(void){
+void SetupSincOptFlush(void){
 /*****************************************************************************
-  Function: SetupSINC
+  Function: SetupSincOptFlush
 
   Parameters: None
 
   Returns: None
 
-  Notes: Setup of SINC filter.
+  Notes: Setup of SINC filter for optimum flush of filter
 
 *****************************************************************************/
+  SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_EN, 0);
   SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_RESET, 1);
   SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_DECIMATION_RATE, 128);
   SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_MCLK_DIV, 4);
@@ -182,9 +183,77 @@ void SetupSINC(void){
   SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_RESET, 0);
 }
 
+void SetupSincOptContinious(void){
+/*****************************************************************************
+  Function: SetupSincOptContinious
+
+  Parameters: None
+
+  Returns: None
+
+ Notes: Setup of SINC filter for non-optimum flush of filter
+
+*****************************************************************************/
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_EN, 0);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_RESET, 1);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_DECIMATION_RATE, 125);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_MCLK_DIV, 4);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_SCALE, 5);
+
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_EN_CNT, 1500);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_CFG, 0);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_IRQ_RATE, 10);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_ENABLE_MCLK, 1);
+
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_RESET, 0);
+
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_RESET, 1);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_EN, 0);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_DEC_RATE, 7);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LMAX, 272);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LMIN, 72);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LCNT, 4);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LWIN, 8);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_RESET, 0);
+}
+
+void SetupSincNonOptContinious(void){
+/*****************************************************************************
+  Function: SetupSincOptContinious
+
+  Parameters: None
+
+  Returns: None
+
+ Notes: Setup of SINC filter for non-optimum flush of filter
+
+*****************************************************************************/
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_EN, 0);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_RESET, 1);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_DECIMATION_RATE, 125);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_MCLK_DIV, 4);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_SCALE, 5);
+
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_EN_CNT, 5000);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_CFG, 0);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_IRQ_RATE, 6);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_ENABLE_MCLK, 1);
+
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_RESET, 0);
+
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_RESET, 1);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_EN, 0);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_DEC_RATE, 7);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LMAX, 272);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LMIN, 72);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LCNT, 4);
+	SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_LWIN, 8);
+    SINC_FLUSH_TRIP_IP_mWriteReg(SINC_BASE, SINC_TRIP_RESET, 0);
+}
+
 void EnableSincTrip(void){
 /*****************************************************************************
-  Function: SetupSINC
+  Function: EnableSincTrip
 
   Parameters: None
 
@@ -200,7 +269,7 @@ void EnableSincTrip(void){
 
 void ClearSincTrip(void){
 /*****************************************************************************
-  Function: SetupSINC
+  Function: ClearSincTrip
 
   Parameters: None
 
