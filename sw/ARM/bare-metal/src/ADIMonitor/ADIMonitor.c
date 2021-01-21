@@ -27,6 +27,10 @@ on one of the A9s.
 #include "socal/socal.h"
 
 #include <alt_interrupt.h>
+#include <alt_generalpurpose_io.h>
+#include "hwlib.h"
+#include "alt_16550_uart.h"
+#include "alt_16550_buffer.h"
 
 /*=============  D E F I N E S   =============*/
 
@@ -55,7 +59,7 @@ on one of the A9s.
 #define MOTOR_STOP		82
 #define SET_SPEED       90
 
-#define BAUD_RATE       57600
+#define BAUD_RATE       ALT_16550_BAUDRATE_57600
 
 typedef enum { AUTO,
                SINGLE } trigger_types;
@@ -95,7 +99,9 @@ uint8_t GUI_READY = false;
 /* The following counters are used to determine when the entire buffer has been sent and received */
 volatile int TotalReceivedCount;
 volatile int TotalSentCount;
-int TotalErrorCount;
+static int TotalErrorCount=0;
+ALT_16550_HANDLE_t g_uart0_handle;
+ALT_16550_BUFFER_t buffer;
 
 void Uart0Isr(uint32_t icciar, void* context) {
 /*****************************************************************************
@@ -109,8 +115,9 @@ Notes: This is a replacement for UartCallback, as the Altera UART does not
  have a higher level wrapper as the Xilinx one did.
 *****************************************************************************/
 
+  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
   uint32_t lsr = alt_read_word(ALT_UART0_LSR_ADDR);
-
+  int foo = TotalErrorCount;
   if (ALT_UART_LSR_DR_GET(lsr) == ALT_UART_LSR_DR_E_DATARDY) {
     // Get all data from receive buffer
     do {
@@ -146,9 +153,13 @@ Notes: This is a replacement for UartCallback, as the Altera UART does not
   if (ALT_UART_LSR_RFE_GET(lsr) == ALT_UART_LSR_RFE_E_ERR) {
     TotalErrorCount++;
   }
+  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, 0);
+  if(TotalErrorCount-foo) {
+	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
+  }
 }
 
-void aAdiMonitorInit(void){
+ALT_STATUS_CODE aAdiMonitorInit(void){
 /*****************************************************************************
 Function: aAdiMonitorInit
 
@@ -166,6 +177,7 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   start_idx = 1;
   UART_RxIsrCounter = 0;
   UART_TxIsrCounter = 0;
+  ALT_STATUS_CODE status =1;
 
   //Configuration parameters
   dwn_smp_factor = 1;   // Down sampling factor
@@ -186,37 +198,29 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   PMSMctrl_P.SPEED_REF = 0;
   PMSMctrl_P.POS_REF = 0;
   
+  int intr_target = 0x1; /* 1 = CPU0, 2=CPU1 */
+
   aMcModeHandler(0);
 
   printf("Motor Demo Bare Metal App starting.\r\n");
   printf("Please connect to MATLAB application for further communications at 56700 baud rate.\r\n");
 
   // Change UART baud rate from default (115200) to expected (57600):
-  // Make it so we have access to baud rate divisor
-  uint32_t lcr = alt_read_word(ALT_UART0_LCR_ADDR);
-  lcr |= ALT_UART_LCR_DLAB_SET_MSK;
-  alt_write_word(ALT_UART0_LCR_ADDR, lcr);
-  // Read baud rate divisor
-  uint32_t div = alt_read_word(ALT_UART0_RBR_THR_DLL_ADDR);
-  // Double baud rate divisor to take us from 115200 to 57600
-  alt_write_word(ALT_UART0_RBR_THR_DLL_ADDR, div*2);
-  // Disable access to baud rate divisor so that UART functions again
-  lcr &= ALT_UART_LCR_DLAB_CLR_MSK;
-  alt_write_word(ALT_UART0_LCR_ADDR, lcr);
+  status = alt_16550_init(ALT_16550_DEVICE_SOCFPGA_UART0, 0, 0, &g_uart0_handle);
+  // Configure the buffering
+  if (status == ALT_E_SUCCESS)
+  {
+      status = alt_16550_buffer_init(&buffer, &g_uart0_handle, ALT_INT_INTERRUPT_UART0, intr_target);
+  }
 
-  // Setup interrupt for UART
-  alt_write_word(ALT_UART0_IER_DLH_ADDR, 0);
-
-  alt_int_isr_register(ALT_INT_INTERRUPT_UART0, Uart0Isr, NULL);
-  int target = 0x1; /* 1 = CPU0, 2=CPU1 */ 
-  alt_int_dist_target_set(ALT_INT_INTERRUPT_UART0, target);
-  alt_int_dist_enable(ALT_INT_INTERRUPT_UART0);
-
-  // Enable interrupts for UART
-  alt_write_word(ALT_UART0_IER_DLH_ADDR, ALT_UART_IER_DLH_ERBFI_DLH0_SET_MSK);
-
-  // Enable Tx and Rx FIFOs
-  alt_write_word(ALT_UART0_FCR_ADDR, ALT_UART_FCR_FIFOE_SET_MSK);
+  status |= alt_16550_line_config_set(&g_uart0_handle, ALT_16550_DATABITS_8, ALT_16550_PARITY_DISABLE, ALT_16550_STOPBITS_1);
+  status |= alt_16550_baudrate_set(&g_uart0_handle, BAUD_RATE);
+  status |= alt_16550_enable(&g_uart0_handle);
+  if (status != ALT_E_SUCCESS)
+  {
+      printf("ERROR: alt_16550_enable failed stastus = 0x%08x.\n", (unsigned int)status);
+  }
+  return status;
 }
 
 void AdiMonitor(void){
@@ -233,6 +237,20 @@ void AdiMonitor(void){
     uint16_t i;
     uint8_t *pointer_for_capture_variable;
 
+    char read_buff[1];
+    size_t bytes_to_read = sizeof(read_buff);
+    size_t bytes_read = 0;
+
+    // check if data has been received from UART and process
+    if(ALT_E_SUCCESS == alt_16550_buffer_read_raw(&buffer,read_buff, bytes_to_read, &bytes_read)) {
+    	if(bytes_to_read == bytes_read) {
+    		alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
+    		RxISR(read_buff[0]);
+    	}
+    	else {
+      	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, 0);
+    	}
+    }
     if(CAPTURE_DATA && GUI_READY){  // Only capture when transmission is not in progress. If transmission in progress, just return.
       smp_cnt++;
       if(smp_cnt >= dwn_smp_factor){
@@ -296,15 +314,15 @@ Notes: Call this function to trigger ADIMonitor in SINGLE mode
 }
 
 static void uart_send(const uint8_t* data, uint32_t numBytes) {
-  for (int idx = 0; idx < numBytes; idx++) {
-    // Make sure there is room in transmit FIFO
-    while(1 != ALT_UART_LSR_THRE_GET(alt_read_word(ALT_UART0_LSR_ADDR)))
-    {
-    }
 
-    // Write to transmit FIFO
-    alt_write_word(ALT_UART0_RBR_THR_DLL_ADDR, data[idx]);
-  }
+	size_t bytes_written = 0;
+	ALT_STATUS_CODE status = alt_16550_buffer_write_raw(&buffer, (char*)data, (size_t)numBytes, &bytes_written);
+	if((ALT_E_SUCCESS != status) || (bytes_written != numBytes) ) {
+		SetLed(GPIO_LED1, 1);
+	}
+	else {
+		SetLed(GPIO_LED1, 0);
+	}
 }
 
 void dump_buffer_to_uart(void){
@@ -362,8 +380,9 @@ void RxISR(uint8_t rx_data){
 
   switch(re_expect){
     case RE_EXP_START:
-      if(rx_data==RE_EXP_START) 
+      if(rx_data==RE_EXP_START) {
          re_expect = RE_EXP_TYPE;	/* A start byte has been received */
+      }
     break;
 
     case RE_EXP_TYPE:

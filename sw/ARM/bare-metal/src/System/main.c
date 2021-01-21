@@ -54,7 +54,7 @@ int main(void){
   // LED5 = ALT_GPIO_PORTB, ALT_GPIO_BIT11
   // LED6 = ALT_GPIO_PORTB, ALT_GPIO_BIT12
   // LED7 = ALT_GPIO_PORTB, ALT_GPIO_BIT13 
-    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT11, ALT_GPIO_BIT11);
+    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
 
   // These must be only called once (setup for being able to use interrupts)
   alt_int_global_init();
@@ -68,6 +68,7 @@ int main(void){
   alt_int_global_enable();
 
   while(1){
+	AdiMonitor();  // Call monitor program to capture data
 	cnt++;
   }
 

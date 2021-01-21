@@ -15,6 +15,7 @@ Description:
 #include "measure.h"
 #include "motor_control.h"
 #include <stdio.h>
+#include "platform.h"
 
 #include <alt_interrupt.h>
 #include <alt_generalpurpose_io.h>
@@ -103,7 +104,7 @@ void SincDataIsr(uint32_t icciar, void* context){
 
 	  Sinc0DataEvent++;
 
-	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT15, ALT_GPIO_BIT15);
+	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED4, GPIO_LED4);
       sinc0_latest = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_DATA_LATEST);
 	  sinc1_latest = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_DATA_LATEST);
 	  sinc1_synced = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_DATA_SYNCED);
@@ -114,7 +115,7 @@ void SincDataIsr(uint32_t icciar, void* context){
 
 	  sinc0_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_TRIP); // Just for debugging. Not used for anything
 	  sinc1_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_TRIP); // Just for debugging. Not used for anything
-	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT15, 0);
+	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED4, 0);
 
 	  if(GetMode() != MODE4)
 	    sMcAlgorithm();
@@ -301,6 +302,10 @@ void SetupSincDataIrq(void){
   alt_int_isr_register(SINC_DATA_IRQ_ID, SincDataIsr, NULL);
   int target = 0x1; /* 1 = CPU0, 2=CPU1 */ 
   alt_int_dist_target_set(SINC_DATA_IRQ_ID, target);
+#ifdef SET_IRQ_PRIORITY
+  // Configure the IRQ priority
+  alt_int_dist_priority_set(SINC_DATA_IRQ_ID, SINC_DATA_IRQ_PRIORITY);
+#endif
   alt_int_dist_enable(SINC_DATA_IRQ_ID);
 
   SINC_FLUSH_TRIP_IP_mWriteReg(SINC_DATA_IRQ_BASE, REG_IRQ_EN, 0x1);

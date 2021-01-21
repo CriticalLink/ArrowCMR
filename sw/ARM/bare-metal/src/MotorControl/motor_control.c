@@ -196,13 +196,13 @@ void sMcAlgorithm(void){
   static bool gpio7_state = false;
   gpio7_state = !gpio7_state;
   if (gpio7_state) {
-    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT13, 0);
+    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED7, 0);
   } else {
-    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT13, ALT_GPIO_BIT13);
+    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED7, GPIO_LED7);
   }
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT19, ALT_GPIO_BIT19);
+  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED3, GPIO_LED3);
   PMSMctrl_step0();
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT19, 0);
+  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED3, 0);
   
   if ((taskCounter[1] == 0))
     eventFlags[1] = true;
@@ -211,9 +211,9 @@ void sMcAlgorithm(void){
     static bool gpio6_state = false;
     gpio6_state = !gpio6_state;
     if (gpio6_state) {
-      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT12, 0);
+      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED6, 0);
     } else {
-      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT12, ALT_GPIO_BIT12);
+      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED6, GPIO_LED6);
     }
     PMSMctrl_step1();
     sAppTask();
@@ -234,7 +234,7 @@ void sMcAlgorithm(void){
 
   SetDuty(&ref);
   
-  AdiMonitor();  // Call monitor program to capture data
+  //  move out of ISR-- AdiMonitor();  // Call monitor program to capture data
 }
 /* End Of File */
 

@@ -16,6 +16,7 @@ Description:
 #include <pwm.h>
 #include "motor_control.h"
 #include <stdio.h>
+#include "platform.h"
 
 #include <alt_interrupt.h>
 #include <alt_generalpurpose_io.h>
@@ -103,9 +104,9 @@ void PwmIsr(uint32_t icciar, void* context) {
 		irq_led = !irq_led;
 		// LED2
                 if (irq_led) {
-                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT20, 0);
+                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED2, 0);
                 } else {
-                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT20, ALT_GPIO_BIT20);
+                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED2, GPIO_LED2);
                 }
 		led_count=0;
 	  }
@@ -312,6 +313,10 @@ void SetupPwmIrq(void){
   alt_int_isr_register(PWM_IRQ_ID, PwmIsr, NULL);
   int target = 0x1; /* 1 = CPU0, 2=CPU1 */ 
   alt_int_dist_target_set(PWM_IRQ_ID, target);
+#ifdef SET_IRQ_PRIORITY
+  // Configure the IRQ priority
+  alt_int_dist_priority_set(PWM_IRQ_ID, MOTOR_PWM_IRQ_PRIORITY);
+#endif
   alt_int_dist_enable(PWM_IRQ_ID);
 
   PWM_IP_mWriteReg(PWM_IRQ_BASE, REG_IRQ_EN, 0x3);
