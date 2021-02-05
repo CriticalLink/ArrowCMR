@@ -39,9 +39,10 @@
 #include "socal/alt_uart.h"
 #include "socal/hps.h"
 #include "socal/socal.h"
+#include <platform.h>
 
 #define STDOUT_FILENO 1
-
+static int sbConsoleEnabled = 1;
 int _close(int file)
 {
     /* Succeeds only for STDOUT */
@@ -79,7 +80,9 @@ int _write(int file, char * ptr, unsigned len, int flag )
     {
         return -1;
     }
-
+    if(!sbConsoleEnabled) {
+        return -1;
+    }
     /* Print each character to UART */
     for(int i=0; i<len; i++)
     {
@@ -96,3 +99,6 @@ int _write(int file, char * ptr, unsigned len, int flag )
     return len;
 }
 
+void enable_console(int enable) {
+	sbConsoleEnabled = enable;
+}

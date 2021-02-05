@@ -23,10 +23,8 @@ GROUP(-lgcc -lc -lcs3 -lcs3unhosted -lcs3arm)
 
 MEMORY
 {
-  boot_rom (rx) : ORIGIN = 0xfffd0000, LENGTH = 64K
-  oc_ram (rwx) : ORIGIN = 0xffff0000, LENGTH = 64K
   /* Need to have 64bytes available before start of program, to store the mkimage header */
-  ram (rwx) : ORIGIN = 0x100000 + 0x40, LENGTH = 16M
+  ram (rwx) : ORIGIN = 0x02100000, LENGTH = 32M
 }
 
 /* These force the linker to search for particular symbols from
@@ -35,10 +33,14 @@ MEMORY
  */
 EXTERN(__cs3_reset __cs3_reset_cycloneV_dk_ram)
 EXTERN(__cs3_start_asm _start)
+
+/* Enable arm semihosting EXTERN(__auto_semihosting) */
+
 /* Bring in the interrupt routines & vector */
 INCLUDE arm-names.inc
 EXTERN(__cs3_interrupt_vector_arm)
 EXTERN(__cs3_start_c main __cs3_stack __cs3_heap_end)
+/* force exit to be picked up in a hosted or os environment EXTERN(exit atexit) */
 
 /* Provide fall-back values */
 PROVIDE(__cs3_heap_start = _end);
@@ -131,11 +133,6 @@ SECTIONS
     . = ALIGN(4);
     __cs3_regions = .;
     LONG (0)
-    LONG (__cs3_region_init_oc_ram)
-    LONG (__cs3_region_start_oc_ram)
-    LONG (__cs3_region_init_size_oc_ram)
-    LONG (__cs3_region_zero_size_oc_ram)
-    LONG (0)
     LONG (__cs3_region_init_ram)
     LONG (__cs3_region_start_ram)
     LONG (__cs3_region_init_size_ram)
@@ -145,51 +142,10 @@ SECTIONS
     _etext = .;
   } >ram
 
-  ASSERT (!(__cs3_region_init_oc_ram & 7), "__cs3_region_init_oc_ram not aligned")
-  ASSERT (!(__cs3_region_start_oc_ram & 7), "__cs3_region_start_oc_ram not aligned")
-  ASSERT (!(__cs3_region_init_size_oc_ram & 7), "__cs3_region_init_size_oc_ram not aligned")
-  ASSERT (!(__cs3_region_zero_size_oc_ram & 7), "__cs3_region_zero_size_oc_ram not aligned")
   ASSERT (!(__cs3_region_init_ram & 7), "__cs3_region_init_ram not aligned")
   ASSERT (!(__cs3_region_start_ram & 7), "__cs3_region_start_ram not aligned")
   ASSERT (!(__cs3_region_init_size_ram & 7), "__cs3_region_init_size_ram not aligned")
   ASSERT (!(__cs3_region_zero_size_ram & 7), "__cs3_region_zero_size_ram not aligned")
-  .cs3.boot_rom : ALIGN (8)
-  {
-    __cs3_region_start_boot_rom = .;
-    *(.cs3.region-head.boot_rom)
-    *(.boot_rom)
-    . = ALIGN (8);
-  } >boot_rom
-  .cs3.boot_rom.bss :
-  {
-    *(.boot_rom.b .bss.boot_rom)
-    . = ALIGN (8);
-  } >boot_rom
-  /* __cs3_region_end_boot_rom is deprecated */
-  __cs3_region_end_boot_rom = __cs3_region_start_boot_rom + LENGTH(boot_rom);
-  __cs3_region_size_boot_rom = LENGTH(boot_rom);
-  __cs3_region_init_boot_rom = LOADADDR (.cs3.boot_rom);
-  __cs3_region_init_size_boot_rom = LOADADDR (.cs3.boot_rom.bss) - LOADADDR (.cs3.boot_rom);
-  __cs3_region_zero_size_boot_rom = SIZEOF(.cs3.boot_rom.bss);
-
-  .cs3.oc_ram : ALIGN (8)
-  {
-    __cs3_region_start_oc_ram = .;
-    *(.cs3.region-head.oc_ram)
-    *(.oc_ram)
-    . = ALIGN (8);
-  } >oc_ram
-  .cs3.oc_ram.bss :
-  {
-    *(.oc_ram.b .bss.oc_ram)
-    . = ALIGN (8);
-  } >oc_ram
-  /* __cs3_region_end_oc_ram is deprecated */
-  __cs3_region_end_oc_ram = __cs3_region_start_oc_ram + LENGTH(oc_ram);
-  __cs3_region_size_oc_ram = LENGTH(oc_ram);
-  __cs3_region_init_oc_ram = LOADADDR (.cs3.oc_ram);
-  __cs3_region_init_size_oc_ram = LOADADDR (.cs3.oc_ram.bss) - LOADADDR (.cs3.oc_ram);
-  __cs3_region_zero_size_oc_ram = SIZEOF(.cs3.oc_ram.bss);
 
   .data : ALIGN (8)
   {
@@ -204,6 +160,7 @@ SECTIONS
   } >ram
   .bss : ALIGN (8)
   {
+     __bss_start__ = .;
     *(.shbss)
     *(.bss .bss.* .gnu.linkonce.b.*)
     *(COMMON)
@@ -212,6 +169,7 @@ SECTIONS
     . = ALIGN (8);
     _end = .;
     __end = .;
+    __bss_end__ = .;
   } >ram
   /* __cs3_region_end_ram is deprecated */
   __cs3_region_end_ram = __cs3_region_start_ram + LENGTH(ram);
@@ -219,7 +177,7 @@ SECTIONS
   __cs3_region_init_ram = LOADADDR (.text);
   __cs3_region_init_size_ram = _edata - ADDR (.text);
   __cs3_region_zero_size_ram = _end - _edata;
-
+  
   .stab 0 (NOLOAD) : { *(.stab) }
   .stabstr 0 (NOLOAD) : { *(.stabstr) }
   /* DWARF debug sections.

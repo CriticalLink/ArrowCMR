@@ -23,16 +23,12 @@ Description:
 /*=============  D E F I N E S   =============*/
 
 /* SINC definements */
-#define SINC_DATA_IRQ_BASE 0xFF203000
-#define SINC_DATA_IRQ_ID ALT_INT_INTERRUPT_F2S_FPGA_IRQ5
 #define REG_IRQ_EN 32
 #define REG_IRQ_ACK 33
 #define REG_IRQ_PEN 33
 
 #define BITM_SINC0_DATA_IRQ 0x00000001
 #define BITM_SINC1_DATA_IRQ 0x00000002
-
-#define SINC_BASE 0xFF203000
 
 #define SINC_RESET 0
 #define SINC0_DATA_LATEST 1
@@ -104,7 +100,7 @@ void SincDataIsr(uint32_t icciar, void* context){
 
 	  Sinc0DataEvent++;
 
-	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED4, GPIO_LED4);
+	  //SetLed(GPIO_LED4, 1);
       sinc0_latest = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_DATA_LATEST);
 	  sinc1_latest = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_DATA_LATEST);
 	  sinc1_synced = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_DATA_SYNCED);
@@ -115,7 +111,7 @@ void SincDataIsr(uint32_t icciar, void* context){
 
 	  sinc0_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_TRIP); // Just for debugging. Not used for anything
 	  sinc1_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_TRIP); // Just for debugging. Not used for anything
-	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED4, 0);
+	  //SetLed(GPIO_LED4, 0);
 
 	  if(GetMode() != MODE4)
 	    sMcAlgorithm();

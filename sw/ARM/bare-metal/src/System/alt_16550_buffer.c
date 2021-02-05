@@ -373,6 +373,7 @@ static ALT_STATUS_CODE alt_16550_buffer_int_rx(ALT_16550_BUFFER_t * buffer)
     return status;
 }
 
+
 /*
 // Helper function to handle UART TX interrupts.
 */
@@ -445,6 +446,14 @@ static ALT_STATUS_CODE alt_16550_buffer_int_tx(ALT_16550_BUFFER_t * buffer)
 #endif
 
     return status;
+}
+
+/*
+// Helper function to handle UART TX interrupts.
+*/
+ALT_STATUS_CODE alt_16550_do_tx(ALT_16550_BUFFER_t * buffer)
+{
+	return alt_16550_buffer_int_tx(buffer);
 }
 
 static ALT_STATUS_CODE alt_16550_buffer_int_line(ALT_16550_BUFFER_t * buffer)
@@ -613,7 +622,9 @@ ALT_STATUS_CODE alt_16550_buffer_init(ALT_16550_BUFFER_t * buffer,
         }
         status = alt_int_dist_target_set(int_id, int_target);
     }
-
+#ifdef SET_IRQ_PRIORITY
+    alt_int_dist_priority_set(int_id,UART_IRQ_PRIORITY);
+#endif
     /* Enable interrupt */
     if (status == ALT_E_SUCCESS)
     {
@@ -700,11 +711,13 @@ ALT_STATUS_CODE alt_16550_buffer_level_tx(ALT_16550_BUFFER_t * buffer, uint32_t 
 {
     ALT_STATUS_CODE status = ALT_E_SUCCESS;
 
+#ifdef HAVE_UART_TX_INT
     /* Disable TX ISR */
     if (status == ALT_E_SUCCESS)
     {
         status = alt_16550_int_disable_tx(buffer->handle);
     }
+#endif
 
 #if ALT_16550_BUFFER_ENABLE_SMP
     /* Wait for the ISR to exit the TX section */
@@ -730,13 +743,14 @@ ALT_STATUS_CODE alt_16550_buffer_level_tx(ALT_16550_BUFFER_t * buffer, uint32_t 
     if (status == ALT_E_SUCCESS)
     {
         *level = buffer->tx_level;
+#ifdef HAVE_UART_TX_INT
 
         if (buffer->tx_level > 0)
         {
             status = alt_16550_int_enable_tx(buffer->handle);
         }
+#endif
     }
-
     return status;
 }
 
@@ -1125,12 +1139,13 @@ ALT_STATUS_CODE alt_16550_buffer_write_raw(ALT_16550_BUFFER_t * buffer,
         *size_written = copy_size;
     }
 
+#ifdef HAVE_UART_TX_INT
     /* Now that there is some data to send, enable TX interrupts */
     if (status == ALT_E_SUCCESS)
     {
         status = alt_16550_int_enable_tx(buffer->handle);
     }
-
+#endif
     return status;
 }
 

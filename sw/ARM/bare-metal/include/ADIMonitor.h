@@ -20,7 +20,8 @@ on one of the A9s.
 ALT_STATUS_CODE aAdiMonitorInit(void);
 void AdiMonitor(void);
 void TrigAdiMonitor(void);  // Call this function to trigger ADIMonitor in SINGLE mode
-
+void checkTxBuffer();
+void checkRxUart(void);
 /*=============  EXTERNAL VARIABLES  =============*/
 
 

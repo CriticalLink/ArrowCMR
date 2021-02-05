@@ -48,25 +48,7 @@ void aAppInit(void){
 	  aMcInit();
   }
   else {
-	  for(;;) {
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED1, 0);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED2, 0);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED3, 0);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED4, 0);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, 0);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED6, 0);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED7, 0);
-		    for(volatile int ii = 0; ii < 10000000; ++ii);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED1, GPIO_LED1);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED2, GPIO_LED2);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED3, GPIO_LED3);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED4, GPIO_LED4);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED6, GPIO_LED6);
-		    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED7, GPIO_LED7);
-		    for(volatile int ii = 0; ii < 10000000; ++ii);
-
-	  }
+	  failExit("aAdiMonitorInit() failed");
   }
 }
 

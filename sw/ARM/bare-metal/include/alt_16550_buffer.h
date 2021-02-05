@@ -428,6 +428,11 @@ ALT_STATUS_CODE alt_16550_buffer_echo_enable(ALT_16550_BUFFER_t * buffer,
  */
 ALT_STATUS_CODE alt_16550_buffer_echo_disable(ALT_16550_BUFFER_t * buffer);
 
+/*!
+ * transmit bytes in the tx buffer
+ */
+ALT_STATUS_CODE alt_16550_do_tx(ALT_16550_BUFFER_t * buffer);
+
 #ifdef __cplusplus
 }
 #endif

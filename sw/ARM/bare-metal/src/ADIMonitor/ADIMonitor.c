@@ -59,7 +59,7 @@ on one of the A9s.
 #define MOTOR_STOP		82
 #define SET_SPEED       90
 
-#define BAUD_RATE       ALT_16550_BAUDRATE_57600
+#define BAUD_RATE       ALT_16550_BAUDRATE_115200
 
 typedef enum { AUTO,
                SINGLE } trigger_types;
@@ -103,61 +103,6 @@ static int TotalErrorCount=0;
 ALT_16550_HANDLE_t g_uart0_handle;
 ALT_16550_BUFFER_t buffer;
 
-void Uart0Isr(uint32_t icciar, void* context) {
-/*****************************************************************************
-Function: Uart0Isr
-
-Parameters: N/A
-
-Returns: None
-
-Notes: This is a replacement for UartCallback, as the Altera UART does not
- have a higher level wrapper as the Xilinx one did.
-*****************************************************************************/
-
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
-  uint32_t lsr = alt_read_word(ALT_UART0_LSR_ADDR);
-  int foo = TotalErrorCount;
-  if (ALT_UART_LSR_DR_GET(lsr) == ALT_UART_LSR_DR_E_DATARDY) {
-    // Get all data from receive buffer
-    do {
-      UART_RxIsrCounter++;
-      RxISR(alt_read_word(ALT_UART0_RBR_THR_DLL_ADDR));
-    } while (ALT_UART_LSR_DR_GET(alt_read_word(ALT_UART0_LSR_ADDR)) == ALT_UART_LSR_DR_E_DATARDY);
-  }
-
-  if (ALT_UART_LSR_OE_GET(lsr) == ALT_UART_LSR_OE_E_OVERRUN) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_PE_GET(lsr) == ALT_UART_LSR_PE_E_PARITYERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_PE_GET(lsr) == ALT_UART_LSR_PE_E_PARITYERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_FE_GET(lsr) == ALT_UART_LSR_FE_E_FRMERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_FE_GET(lsr) == ALT_UART_LSR_FE_E_FRMERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_THRE_GET(lsr) == 1) {
-    UART_TxIsrCounter++;
-  }
-
-  if (ALT_UART_LSR_RFE_GET(lsr) == ALT_UART_LSR_RFE_E_ERR) {
-    TotalErrorCount++;
-  }
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, 0);
-  if(TotalErrorCount-foo) {
-	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
-  }
-}
 
 ALT_STATUS_CODE aAdiMonitorInit(void){
 /*****************************************************************************
@@ -203,9 +148,11 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   aMcModeHandler(0);
 
   printf("Motor Demo Bare Metal App starting.\r\n");
-  printf("Please connect to MATLAB application for further communications at 56700 baud rate.\r\n");
+  printf("Please connect to UI application for further communications at %d baud rate.\r\n",BAUD_RATE);
 
-  // Change UART baud rate from default (115200) to expected (57600):
+  printf("SW3 is %d SW4 is %d SW5 is %d SW6 is %d\r\n",SwitchState(GPIO_SW3),SwitchState(GPIO_SW4),SwitchState(GPIO_SW5),SwitchState(GPIO_SW6));
+
+  // Change UART baud rate from default (115200) to expected (BAUD_RATE):
   status = alt_16550_init(ALT_16550_DEVICE_SOCFPGA_UART0, 0, 0, &g_uart0_handle);
   // Configure the buffering
   if (status == ALT_E_SUCCESS)
@@ -223,6 +170,23 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   return status;
 }
 
+void checkRxUart(void) {
+    char read_buff[1];
+    size_t bytes_to_read = sizeof(read_buff);
+    size_t bytes_read = 0;
+    uint32_t bytes_available = 0;
+    alt_16550_buffer_level_rx(&buffer, &bytes_available);
+
+    while(bytes_available) {
+    	// check if data has been received from UART and process
+    	if(ALT_E_SUCCESS == alt_16550_buffer_read_raw(&buffer,read_buff, bytes_to_read, &bytes_read)) {
+    		if(bytes_to_read == bytes_read) {
+    			RxISR(read_buff[0]);
+    		}
+    	}
+    	--bytes_available;
+    }
+}
 void AdiMonitor(void){
 /*****************************************************************************
   Function: AdiMonitor
@@ -237,32 +201,20 @@ void AdiMonitor(void){
     uint16_t i;
     uint8_t *pointer_for_capture_variable;
 
-    char read_buff[1];
-    size_t bytes_to_read = sizeof(read_buff);
-    size_t bytes_read = 0;
+    int ok_to_capture = CAPTURE_DATA && GUI_READY;
 
-    // check if data has been received from UART and process
-    if(ALT_E_SUCCESS == alt_16550_buffer_read_raw(&buffer,read_buff, bytes_to_read, &bytes_read)) {
-    	if(bytes_to_read == bytes_read) {
-    		alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, GPIO_LED5);
-    		RxISR(read_buff[0]);
-    	}
-    	else {
-      	  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED5, 0);
-    	}
-    }
-    if(CAPTURE_DATA && GUI_READY){  // Only capture when transmission is not in progress. If transmission in progress, just return.
+    if(ok_to_capture){  // Only capture when transmission is not in progress. If transmission in progress, just return.
       smp_cnt++;
       if(smp_cnt >= dwn_smp_factor){
         smp_cnt=0;
 
         for ( i=0; i < buf_no; i++){
-          pointer_for_capture_variable = (uint8_t *) adr_for_capture_variables[i];
-          monitor_tx_buf[capt_ptr] = *pointer_for_capture_variable; /* Capture data at the selected addresses */
-          buf_idx++;
-          capt_ptr++;
-          if(capt_ptr == TX_BUF_SIZE_MAX)
-            capt_ptr = 1;
+        	pointer_for_capture_variable = (uint8_t *) adr_for_capture_variables[i];
+        	monitor_tx_buf[capt_ptr] = *pointer_for_capture_variable; /* Capture data at the selected addresses */
+        	buf_idx++;
+        	capt_ptr++;
+        	if(capt_ptr == TX_BUF_SIZE_MAX)
+        		capt_ptr = 1;
         }
 
         switch(trigger){
@@ -316,13 +268,12 @@ Notes: Call this function to trigger ADIMonitor in SINGLE mode
 static void uart_send(const uint8_t* data, uint32_t numBytes) {
 
 	size_t bytes_written = 0;
+	SetLed(GPIO_LED4, 1);
 	ALT_STATUS_CODE status = alt_16550_buffer_write_raw(&buffer, (char*)data, (size_t)numBytes, &bytes_written);
-	if((ALT_E_SUCCESS != status) || (bytes_written != numBytes) ) {
-		SetLed(GPIO_LED1, 1);
+	if(ALT_E_SUCCESS != status) {
+		++TotalErrorCount;
 	}
-	else {
-		SetLed(GPIO_LED1, 0);
-	}
+	SetLed(GPIO_LED4, 0!=TotalErrorCount);
 }
 
 void dump_buffer_to_uart(void){
@@ -337,6 +288,7 @@ void dump_buffer_to_uart(void){
 *****************************************************************************/
   uint16_t idx = 1;
   uint16_t buffer_cnt = 1;
+  SetLed(GPIO_LED5, 1);
 
   CAPTURE_DATA = false;      // Tell monitor to stop capturing while transmit in going on.
   monitor_tx_buf[0]=0xAA;    // GUI expects 0xAA as first char.
@@ -359,6 +311,7 @@ void dump_buffer_to_uart(void){
   else{
     uart_send(monitor_tx_buf, tx_buf_size);
   }
+  SetLed(GPIO_LED5, 0);
 }
 
 void RxISR(uint8_t rx_data){
@@ -553,6 +506,10 @@ void reset_monitor(void){
   ready_for_trigger = 0;
   re_expect = RE_EXP_START;
 
+  for(int ii = 1; ii < TX_BUF_SIZE_MAX; ++ii) {
+	  monitor_tx_buf[ii] = 10.0;
+	    monitor_tx_buf_reshuffled[ii] = 20.0;
+  }
   if (buf_no > MAX_NO_OF_BUF)
     buf_no = MAX_NO_OF_BUF;
 
@@ -568,4 +525,16 @@ void reset_monitor(void){
     buffer_length = (TX_BUF_SIZE_MAX - MAX_NO_OF_BUF)/buf_no;
     tx_buf_size = buf_no * buffer_length + 1;
   }
+}
+
+
+void checkTxBuffer(void)
+{
+	uint32_t level = 0;
+	ALT_STATUS_CODE status = alt_16550_buffer_level_tx(&buffer, &level);
+	if(status == ALT_E_SUCCESS) {
+		if (level > 0) {
+			status = alt_16550_do_tx(&buffer);
+		}
+	}
 }

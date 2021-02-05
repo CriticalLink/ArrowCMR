@@ -15,9 +15,9 @@ Description:
 /*=============  I N C L U D E S   =============*/
 #include <stdint.h>
 #include "rtwtypes.h"
+#include "platform.h"
 
 /*=============  D E F I N E S   =============*/
-#define QEP_BASE 0xFF202000
 
 // M -> S
 #define REG_QEP_CONFIG 0

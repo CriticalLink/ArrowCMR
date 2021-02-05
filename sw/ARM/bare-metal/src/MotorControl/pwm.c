@@ -22,8 +22,6 @@ Description:
 #include <alt_generalpurpose_io.h>
 
 /*=============  D E F I N E S   =============*/
-#define PWM_IRQ_BASE 0xFF201000
-#define PWM_IRQ_ID ALT_INT_INTERRUPT_F2S_FPGA_IRQ4	
 #define REG_IRQ_EN 16 
 #define REG_IRQ_ACK 17 
 #define REG_IRQ_PEN 17 
@@ -50,8 +48,6 @@ Description:
 #define REG_TRIP_CLEAR 12
 #define REG_PWM_STATUS 13 
 
-/* 	Define the base memory address of PWM IP core */
-#define PWM_BASE 0xFF201000
 
 #define LED_PIN	0	/* The MIO connected to the PS is GPIO 50 */
 #define LED_CNT_MAX 5000
@@ -102,12 +98,7 @@ void PwmIsr(uint32_t icciar, void* context) {
 
 	  if(led_count==LED_CNT_MAX){
 		irq_led = !irq_led;
-		// LED2
-                if (irq_led) {
-                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED2, 0);
-                } else {
-                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED2, GPIO_LED2);
-                }
+		SetLed(GPIO_LED2, irq_led);
 		led_count=0;
 	  }
 

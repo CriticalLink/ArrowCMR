@@ -21,6 +21,7 @@ Description:
 #include <measure.h>
 #include <qep.h>
 #include <alt_generalpurpose_io.h>
+#include <alt_interrupt.h>
 
 /*=============  D E F I N E S   =============*/
 
@@ -174,7 +175,8 @@ void sMcAlgorithm(void){
   static boolean_T eventFlags[2] = { 0, 0 };/* Model has 2 rates */
   static uint16_t taskCounter[2] = { 0, 0 };
   duty_type ref;
-
+  alt_int_global_disable_all();
+  SetLed(GPIO_LED7, 1);
   PMSMctrl_U.Vdc_adc = 24.0;
   PMSMctrl_U.ibc_sinc[1] = GetSincData(0);
   PMSMctrl_U.ibc_sinc[0] = GetSincData(1);
@@ -193,30 +195,20 @@ void sMcAlgorithm(void){
   qep_dir_monitor = (int8_t)PMSMctrl_U.ROT_DIR_meas;
     
   /* Step the model for base rate */
-  static bool gpio7_state = false;
-  gpio7_state = !gpio7_state;
-  if (gpio7_state) {
-    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED7, 0);
-  } else {
-    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED7, GPIO_LED7);
-  }
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED3, GPIO_LED3);
+  SetLed(GPIO_LED3,1);
   PMSMctrl_step0();
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED3, 0);
+  SetLed(GPIO_LED3,0);
   
   if ((taskCounter[1] == 0))
     eventFlags[1] = true;
   
   if (eventFlags[1]) {  /* Step the model for subrate 1 */
-    static bool gpio6_state = false;
-    gpio6_state = !gpio6_state;
-    if (gpio6_state) {
-      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED6, 0);
-    } else {
-      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, GPIO_LED6, GPIO_LED6);
-    }
+    SetLed(GPIO_LED3,1);
     PMSMctrl_step1();
+    SetLed(GPIO_LED3,0);
+    SetLed(GPIO_LED3,1);
     sAppTask();
+    SetLed(GPIO_LED3,0);
     eventFlags[1] = false;  /* Indicate task complete for subrate */
   }
   
@@ -233,8 +225,12 @@ void sMcAlgorithm(void){
   ref.duty_c = duty_c;
 
   SetDuty(&ref);
-  
-  //  move out of ISR-- AdiMonitor();  // Call monitor program to capture data
+  // AdiMonitor must be called from here is it collects realtime data
+  SetLed(GPIO_LED3,1);
+  AdiMonitor();  // Call monitor program to capture data
+  SetLed(GPIO_LED3,0);
+  alt_int_global_enable_all();
+  SetLed(GPIO_LED7, 0);
 }
 /* End Of File */
 
