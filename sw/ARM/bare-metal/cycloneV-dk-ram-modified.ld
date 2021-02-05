@@ -24,7 +24,8 @@ GROUP(-lgcc -lc -lcs3 -lcs3unhosted -lcs3arm)
 MEMORY
 {
   /* Need to have 64bytes available before start of program, to store the mkimage header */
-  ram (rwx) : ORIGIN = 0x02100000, LENGTH = 32M
+  /* ram (rwx) : ORIGIN = 0x02100000, LENGTH = 32M */
+  ram (rwx) : ORIGIN = 0x100000 + 0x40, LENGTH = 32M
 }
 
 /* These force the linker to search for particular symbols from
