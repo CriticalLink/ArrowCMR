@@ -19,9 +19,7 @@
 
 #include "PMSMctrl.h"
 #include "PMSMctrl_private.h"
-#include "platform.h"
-static int led_flag = 1;
-#define TOGGLE_LED { SetLed(GPIO_LED6,led_flag);led_flag = !led_flag; }
+
 /* Named constants for MATLAB Function: '<S7>/MATLAB Function1' */
 #define PMSMctrl_EncoderPulses         (4000.0F)
 
@@ -224,7 +222,6 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   static const int16_T b[6] = { 90, 330, 30, 210, 150, 270 };
 
   static const int16_T c[6] = { 240, 300, 0, 60, 120, 180 };
-led_flag = 0; TOGGLE_LED
   /* Update the flag to indicate when data transfers from
    *  Sample time: [0.0001s, 0.0s] to Sample time: [0.001s, 0.0s]  */
   (PMSMctrl_M->Timing.RateInteraction.TID0_1)++;
@@ -296,7 +293,6 @@ led_flag = 0; TOGGLE_LED
   }
 
   /* End of Saturate: '<S33>/Saturation' */
-  TOGGLE_LED
   /* Sum: '<S33>/Sum' */
   PMSMctrl_B.y = PMSMctrl_B.Deltau_limit + PMSMctrl_B.y1;
 
@@ -395,7 +391,6 @@ led_flag = 0; TOGGLE_LED
     PMSMctrl_DWork.AngleStartTable_not_empty = true;
   }
 
-  TOGGLE_LED
   if (!PMSMctrl_DWork.AngleTable_not_empty) {
     /* '<S25>:1:51' */
     /* '<S25>:1:65' */
@@ -517,7 +512,6 @@ led_flag = 0; TOGGLE_LED
         }
         break;
       }
-      TOGGLE_LED
 
       /* '<S25>:1:137' */
       PMSMctrl_DWork.OffsetState = 2U;
@@ -598,7 +592,6 @@ led_flag = 0; TOGGLE_LED
 
   /* Constant: '<S1>/SPEED_REF2' */
   speed_ff = PMSMctrl_P.SPD_FF;
-  TOGGLE_LED
 
   /* Switch: '<S10>/Switch4' incorporates:
    *  Constant: '<S10>/id_ref3'
@@ -700,7 +693,6 @@ led_flag = 0; TOGGLE_LED
   } else {
     PMSMctrl_B.MAX_RPM = PMSMctrl_B.Switch;
   }
-  TOGGLE_LED
 
   /* End of Saturate: '<S88>/MAX_RPM' */
 
@@ -797,7 +789,6 @@ led_flag = 0; TOGGLE_LED
     PMSMctrl_DWork.sample_count = 0U;
   }
 
-  TOGGLE_LED
   /* '<S41>:1:19' */
   cnt_temp = PMSMctrl_DWork.sample_count + 1U;
   if (cnt_temp > 65535U) {
@@ -897,7 +888,6 @@ led_flag = 0; TOGGLE_LED
     multi_out = 2.4E+10F / ((real32_T)PMSMctrl_U.N_by_M * PMSMctrl_EncoderPulses);
   }
 
-  TOGGLE_LED
   /* '<S22>:1:25' */
   speed_meas_raw_n_by_m = multi_out;
 
@@ -997,7 +987,6 @@ led_flag = 0; TOGGLE_LED
   }
 
   PMSMctrl_B.Integrator = PMSMctrl_DWork.Integrator_DSTATE;
-  TOGGLE_LED
 
   /* End of DiscreteIntegrator: '<S71>/Integrator' */
 
@@ -1097,7 +1086,6 @@ led_flag = 0; TOGGLE_LED
   /* DataTypeConversion: '<S8>/Data Type Conversion7' incorporates:
    *  Inport: '<Root>/iab_sinc'
    */
-  TOGGLE_LED
   PMSMctrl_B.DataTypeConversion7[0] = PMSMctrl_U.ibc_sinc[0];
   PMSMctrl_B.DataTypeConversion7[1] = PMSMctrl_U.ibc_sinc[1];
 
@@ -1197,7 +1185,6 @@ led_flag = 0; TOGGLE_LED
   /* Sum: '<S8>/Sum3' */
   PMSMctrl_B.Sum3 = (0.0F - PMSMctrl_B.Gain7[0]) - PMSMctrl_B.Gain7[1];
 
-  TOGGLE_LED
   /* MATLAB Function: '<S8>/MATLAB Function' incorporates:
    *  Constant: '<S1>/SYS_CMD'
    *  Inport: '<Root>/iabc_adc'
@@ -1306,7 +1293,6 @@ led_flag = 0; TOGGLE_LED
     /* '<S26>:1:61' */
     PMSMctrl_DWork.sample_o = 0;
   }
-  TOGGLE_LED
 
   /* '<S26>:1:64' */
   PMSMctrl_DWork.SysCmd_old_m = PMSMctrl_P.SYSTEM_CMD;
@@ -1397,7 +1383,6 @@ led_flag = 0; TOGGLE_LED
   /* Gain: '<S87>/Gain1' */
   PMSMctrl_B.Gain1_f = (int16_T)mul_s32_sr32(1891631104, PMSMctrl_B.Product1_g);
 
-  TOGGLE_LED
   /* UnitDelay: '<S87>/Unit Delay' */
   PMSMctrl_B.UnitDelay = PMSMctrl_DWork.UnitDelay_DSTATE_h;
 
@@ -1496,9 +1481,7 @@ led_flag = 0; TOGGLE_LED
 
     /* '<S21>:1:97' */
     PMSMctrl_DWork.OffsetState_b = 1U;
-    TOGGLE_LED
   } else if (PMSMctrl_DWork.OffsetState_b == 1) {
-	  TOGGLE_LED
     /* '<S21>:1:99' */
     if (PMSMctrl_U.hall_state != PMSMctrl_DWork.HallIn_m) {
       /* '<S21>:1:100' */
@@ -1601,7 +1584,6 @@ led_flag = 0; TOGGLE_LED
     /* '<S21>:1:151' */
     PMSMctrl_DWork.HallIn_m = PMSMctrl_U.hall_state;
   }
-  TOGGLE_LED
 
   /* '<S21>:1:154' */
   PMSMctrl_B.y_i5 = PMSMctrl_DWork.AbsAngle_d;
@@ -1696,7 +1678,6 @@ led_flag = 0; TOGGLE_LED
   PMSMctrl_B.coswt2pi3_g = (0.0F - PMSMctrl_B.coswt2pi3) -
     PMSMctrl_B.sine_cosine2_o2;
 
-  TOGGLE_LED
   /* Fcn: '<S89>/Fcn2' */
   id = ((PMSMctrl_B.Switch1_l[0] * PMSMctrl_B.sine_cosine2_o1 +
          PMSMctrl_B.Switch1_l[1] * PMSMctrl_B.sinwt2pi3) + PMSMctrl_B.Switch1_l
@@ -1807,7 +1788,6 @@ led_flag = 0; TOGGLE_LED
     PMSMctrl_B.Switch2_m[1] = 0.0F;
     PMSMctrl_B.Switch2_m[2] = 0.0F;
   }
-  TOGGLE_LED
 
   /* End of Switch: '<S16>/Switch2' */
 
@@ -1896,7 +1876,6 @@ led_flag = 0; TOGGLE_LED
   /* S-Function (SVPWM_float): '<S12>/SVmod' incorporates:
    *  Constant: '<S1>/VF_GAIN1'
    */
-  TOGGLE_LED
   SVPWM_float_Outputs_wrapper(&PMSMctrl_B.Va, &PMSMctrl_B.Vb, &PMSMctrl_B.Vc,
     &PMSMctrl_ConstP.pooled21, &PMSMctrl_B.SVmod_o1, &PMSMctrl_B.SVmod_o2,
     &PMSMctrl_B.SVmod_o3 );
@@ -1998,7 +1977,6 @@ led_flag = 0; TOGGLE_LED
 
   /* Gain: '<S30>/Gain6' */
   ib_sar = 1.0F * PMSMctrl_B.Gain[1];
-  TOGGLE_LED
 
   /* Gain: '<S30>/Gain7' */
   ic_sar = 1.0F * PMSMctrl_B.Gain[2];
@@ -2096,7 +2074,6 @@ led_flag = 0; TOGGLE_LED
   }
 
   /* End of Switch: '<S64>/Switch' */
-  TOGGLE_LED
 
   /* Switch: '<S14>/Switch4' incorporates:
    *  Constant: '<S14>/SpdMul5'
@@ -2201,8 +2178,6 @@ led_flag = 0; TOGGLE_LED
   /* Update for Memory: '<S18>/Memory1' */
   PMSMctrl_DWork.Memory1_PreviousInput[0] = PMSMctrl_B.dq_is_lim[0];
   PMSMctrl_DWork.Memory1_PreviousInput[1] = PMSMctrl_B.dq_is_lim[1];
-  TOGGLE_LED
-  led_flag = 0; TOGGLE_LED
 }
 
 /* Model step function for TID1 */
