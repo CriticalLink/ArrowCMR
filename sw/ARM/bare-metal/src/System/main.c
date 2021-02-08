@@ -46,6 +46,8 @@ int main(void){
 	static int cnt=0;
 	volatile uint32_t* reg = (volatile uint32_t*)0xFF200000;
 
+	platformInit();
+
 	time_t fpga_build_time = reg[1];
 
 	printf("\r\n");
@@ -59,25 +61,8 @@ int main(void){
 	UNUSED(led_flagGPIO_LED6);
 	UNUSED(led_flagGPIO_LED7);
 
-	platformInit();
 	aAppInit();
-	reg = (uint32_t *)(0xFF200000);
-	printf("FPGA REGS:\r\n");
-	for(int ii = 0; ii < 4; ++ii) {
-		printf("%p 0x%08lx\r\n", &reg[ii],reg[ii]);
-	}
-	reg = (uint32_t *)(PWM_BASE);
-	for(int ii = 0; ii < 32; ++ii) {
-		printf("%p 0x%08lx\r\n", &reg[ii],reg[ii]);
-	}
-	reg = (uint32_t *)(QEP_BASE);
-	for(int ii = 0; ii < 8; ++ii) {
-		printf("%p 0x%08lx\r\n", &reg[ii],reg[ii]);
-	}
-	reg = (uint32_t *)(SINC_DATA_IRQ_BASE);
-	for(int ii = 0; ii < 48; ++ii) {
-		printf("%p 0x%08lx\r\n", &reg[ii],reg[ii]);
-	}
+
 	for(int ii = 0; ii < 100; ++ii) {
 		TOGGLE_LED(GPIO_LED2);
 		checkTxBuffer();

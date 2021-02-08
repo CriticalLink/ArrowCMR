@@ -59,8 +59,6 @@ on one of the A9s.
 #define MOTOR_STOP		82
 #define SET_SPEED       90
 
-#define BAUD_RATE       ALT_16550_BAUDRATE_115200
-
 typedef enum { AUTO,
                SINGLE } trigger_types;
 
@@ -100,8 +98,6 @@ uint8_t GUI_READY = false;
 volatile int TotalReceivedCount;
 volatile int TotalSentCount;
 static int TotalErrorCount=0;
-ALT_16550_HANDLE_t g_uart0_handle;
-ALT_16550_BUFFER_t buffer;
 
 
 ALT_STATUS_CODE aAdiMonitorInit(void){
@@ -122,7 +118,7 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   start_idx = 1;
   UART_RxIsrCounter = 0;
   UART_TxIsrCounter = 0;
-  ALT_STATUS_CODE status =1;
+  ALT_STATUS_CODE status =ALT_E_SUCCESS;
 
   //Configuration parameters
   dwn_smp_factor = 1;   // Down sampling factor
@@ -143,30 +139,8 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   PMSMctrl_P.SPEED_REF = 0;
   PMSMctrl_P.POS_REF = 0;
   
-  int intr_target = 0x1; /* 1 = CPU0, 2=CPU1 */
-
   aMcModeHandler(0);
 
-  printf("Motor Demo Bare Metal App starting.\r\n");
-  printf("Please connect to UI application for further communications at %d baud rate.\r\n",BAUD_RATE);
-
-  printf("SW3 is %d SW4 is %d SW5 is %d SW6 is %d\r\n",SwitchState(GPIO_SW3),SwitchState(GPIO_SW4),SwitchState(GPIO_SW5),SwitchState(GPIO_SW6));
-
-  // Change UART baud rate from default (115200) to expected (BAUD_RATE):
-  status = alt_16550_init(ALT_16550_DEVICE_SOCFPGA_UART0, 0, 0, &g_uart0_handle);
-  // Configure the buffering
-  if (status == ALT_E_SUCCESS)
-  {
-      status = alt_16550_buffer_init(&buffer, &g_uart0_handle, ALT_INT_INTERRUPT_UART0, intr_target);
-  }
-
-  status |= alt_16550_line_config_set(&g_uart0_handle, ALT_16550_DATABITS_8, ALT_16550_PARITY_DISABLE, ALT_16550_STOPBITS_1);
-  status |= alt_16550_baudrate_set(&g_uart0_handle, BAUD_RATE);
-  status |= alt_16550_enable(&g_uart0_handle);
-  if (status != ALT_E_SUCCESS)
-  {
-      printf("ERROR: alt_16550_enable failed stastus = 0x%08x.\n", (unsigned int)status);
-  }
   return status;
 }
 
@@ -175,11 +149,11 @@ void checkRxUart(void) {
     size_t bytes_to_read = sizeof(read_buff);
     size_t bytes_read = 0;
     uint32_t bytes_available = 0;
-    alt_16550_buffer_level_rx(&buffer, &bytes_available);
+    alt_16550_buffer_level_rx(&g_uart0_buffer, &bytes_available);
 
     while(bytes_available) {
     	// check if data has been received from UART and process
-    	if(ALT_E_SUCCESS == alt_16550_buffer_read_raw(&buffer,read_buff, bytes_to_read, &bytes_read)) {
+    	if(ALT_E_SUCCESS == alt_16550_buffer_read_raw(&g_uart0_buffer,read_buff, bytes_to_read, &bytes_read)) {
     		if(bytes_to_read == bytes_read) {
     			RxISR(read_buff[0]);
     		}
@@ -269,7 +243,7 @@ static void uart_send(const uint8_t* data, uint32_t numBytes) {
 
 	size_t bytes_written = 0;
 	SetLed(GPIO_LED4, 1);
-	ALT_STATUS_CODE status = alt_16550_buffer_write_raw(&buffer, (char*)data, (size_t)numBytes, &bytes_written);
+	ALT_STATUS_CODE status = alt_16550_buffer_write_raw(&g_uart0_buffer, (char*)data, (size_t)numBytes, &bytes_written);
 	if(ALT_E_SUCCESS != status) {
 		++TotalErrorCount;
 	}
@@ -531,10 +505,10 @@ void reset_monitor(void){
 void checkTxBuffer(void)
 {
 	uint32_t level = 0;
-	ALT_STATUS_CODE status = alt_16550_buffer_level_tx(&buffer, &level);
+	ALT_STATUS_CODE status = alt_16550_buffer_level_tx(&g_uart0_buffer, &level);
 	if(status == ALT_E_SUCCESS) {
 		if (level > 0) {
-			status = alt_16550_do_tx(&buffer);
+			status = alt_16550_do_tx(&g_uart0_buffer);
 		}
 	}
 }

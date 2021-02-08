@@ -546,7 +546,6 @@ ALT_STATUS_CODE alt_16550_buffer_init(ALT_16550_BUFFER_t * buffer,
     // Initialize contents of the buffer structure
     */
 
-    buffer->handle = handle;
     buffer->status = ALT_E_SUCCESS;
 
     buffer->fifo_size_rx = 0;
@@ -572,6 +571,8 @@ ALT_STATUS_CODE alt_16550_buffer_init(ALT_16550_BUFFER_t * buffer,
     {
         status = alt_16550_fifo_enable(handle);
     }
+    status =  alt_16550_fifo_clear_rx(handle);
+    status =  alt_16550_fifo_clear_tx(handle);
 
     /* Set the RX and TX trigger levels */
     if (status == ALT_E_SUCCESS)
@@ -629,6 +630,7 @@ ALT_STATUS_CODE alt_16550_buffer_init(ALT_16550_BUFFER_t * buffer,
     if (status == ALT_E_SUCCESS)
     {
         status = alt_int_dist_enable(int_id);
+        buffer->handle = handle;
     }
 
     return status;
