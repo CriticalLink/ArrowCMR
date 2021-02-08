@@ -81,7 +81,7 @@ LINKER_SCRIPT := cycloneV-dk-ram-modified.ld
 #MULTILIBFLAGS := -mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3 -mtune=cortex-a9 -march=armv7-a
 MULTILIBFLAGS := -mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=neon -mtune=cortex-a9 -L$(SDKTARGETSYSROOT)/arm-none-eabi/lib/arm/v5te/softfp/ -L$(SDKTARGETSYSROOT)/arm-none-eabi/lib/
 #CFLAGS  := -g -O0 -Wall -Werror -std=c99 $(MULTILIBFLAGS) -I$(HWLIBS_ROOT)/include -I. -Imsgdma -Iqsys_headers -I$(SOCAL_ROOT) -I./include -I./bsp/include
-COPTM = -O0
+COPTM = -O2
 #CSTD=-std=c99
 CFLAGS  := -g $(COPTM) -Wall $(CSTD) $(MULTILIBFLAGS) -I$(HWLIBS_ROOT)/include -I. -Iqsys_headers -I$(SOCAL_ROOT) -I./include -D$(ALT_DEVICE_FAMILY) -I$(FPGA_GENDIR) -DDEBUG_ALT_MMU
 LDFLAGS := -T$(LINKER_SCRIPT) $(MULTILIBFLAGS) -L$(LDINC_DIR)
