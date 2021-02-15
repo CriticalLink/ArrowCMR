@@ -607,7 +607,7 @@ ALT_STATUS_CODE alt_16550_buffer_read_raw(ALT_16550_BUFFER_t * buffer,
                ptr++;
             }
 
-            data = data+copy_size_1;
+            //data = data+copy_size_1;
             ptr = buffer->rx_buffer;
             for (i = 0; i < copy_size_2; i++)
             {
