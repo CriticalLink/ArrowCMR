@@ -21,6 +21,7 @@ on one of the A9s.
 #include "motor_control.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "socal/alt_uart.h"
 #include "socal/hps.h"
@@ -64,7 +65,11 @@ typedef enum { AUTO,
 
 /*=============  P R O T O T Y P E S =============*/
 void dump_buffer_to_uart(void);
-void reset_monitor(void);
+static int NeedReset = 1;
+void reset_monitor(void) {
+	NeedReset = 1;
+}
+void do_reset_monitor(void);
 void RxISR(uint8_t);
 
 /*=============  D A T A  =============*/
@@ -86,7 +91,7 @@ uint16_t buffer_length = 1;
 uint16_t tx_buf_size = 1;
 uint16_t length_after_trig = 1;
 // Initialized to valid variable address so we can test readback more easily
-uint32_t adr_for_capture_variables[MAX_NO_OF_BUF] = {(uint32_t)&UART_RxIsrCounter};   /* Vector containing the address of the memory to monitor */
+volatile uint32_t adr_for_capture_variables[MAX_NO_OF_BUF] = {(uint32_t)&UART_RxIsrCounter};   /* Vector containing the address of the memory to monitor */
 uint8_t re_expect = RE_EXP_START;
 
 uint8_t triggered = 0;                     /* Current trigger status */
@@ -98,7 +103,6 @@ uint8_t GUI_READY = false;
 volatile int TotalReceivedCount;
 volatile int TotalSentCount;
 static int TotalErrorCount=0;
-
 
 ALT_STATUS_CODE aAdiMonitorInit(void){
 /*****************************************************************************
@@ -173,17 +177,21 @@ void AdiMonitor(void){
          rate after assignment of I/Os.
 *****************************************************************************/
     uint16_t i;
-    uint8_t *pointer_for_capture_variable;
+    volatile uint8_t *pointer_for_capture_variable;
 
     int ok_to_capture = CAPTURE_DATA && GUI_READY;
 
+    if(NeedReset) {
+    	do_reset_monitor();
+    }
+    SetLed(GPIO_LED3,ok_to_capture);
     if(ok_to_capture){  // Only capture when transmission is not in progress. If transmission in progress, just return.
       smp_cnt++;
       if(smp_cnt >= dwn_smp_factor){
         smp_cnt=0;
 
         for ( i=0; i < buf_no; i++){
-        	pointer_for_capture_variable = (uint8_t *) adr_for_capture_variables[i];
+        	pointer_for_capture_variable = (volatile uint8_t *) adr_for_capture_variables[i];
         	monitor_tx_buf[capt_ptr] = *pointer_for_capture_variable; /* Capture data at the selected addresses */
         	buf_idx++;
         	capt_ptr++;
@@ -242,12 +250,12 @@ Notes: Call this function to trigger ADIMonitor in SINGLE mode
 static void uart_send(const uint8_t* data, uint32_t numBytes) {
 
 	size_t bytes_written = 0;
-	SetLed(GPIO_LED4, 1);
 	ALT_STATUS_CODE status = alt_16550_buffer_write_raw(&g_uart0_buffer, (char*)data, (size_t)numBytes, &bytes_written);
-	if(ALT_E_SUCCESS != status) {
+	if(ALT_E_SUCCESS != status || (bytes_written != numBytes)) {
 		++TotalErrorCount;
 	}
-	SetLed(GPIO_LED4, 0!=TotalErrorCount);
+	if(0!=TotalErrorCount)
+		SetLed(GPIO_LED6, 1);
 }
 
 void dump_buffer_to_uart(void){
@@ -461,7 +469,6 @@ void RxISR(uint8_t rx_data){
     }
 }
 
-void reset_monitor(void){
 /*****************************************************************************
   Function: reset_monitor
 
@@ -470,6 +477,8 @@ void reset_monitor(void){
   Returns: None
 
 *****************************************************************************/
+void do_reset_monitor(void){
+  NeedReset = 0;
   buf_idx = 1;
   smp_cnt = 0;
   capt_ptr = 1;
