@@ -31,6 +31,7 @@
 ******************************************************************************/
 
 /*
+ * based on
  * $Id: //acds/rel/18.1std/embedded/examples/software/Altera-SoCFPGA-HardwareLib-16550-CV-GNU/alt_16550_buffer.c#1 $
  */
 
@@ -38,6 +39,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <alt_printf.h>
+#include "platform.h"
 
 /* NOTE: To enable debugging output, delete the next line and uncomment the
    line after. */
@@ -64,190 +66,8 @@ static unsigned long int stdminul(unsigned long int a, unsigned long int b)
     }
 }
 
-/*
-// Counts the population of tokens [token] in the given string [str] up to the
-// given length [n] or end of string character. Does not work well when
-// counting the NULL token.
-*/
-static size_t strnpop(const char * str, size_t n, int token)
-{
-    /* Population of the given token. */
-    size_t pop = 0;
-    size_t i; 
-
-    for (i = 0; i < n; ++i)
-    {
-        if (str[i] == 0)
-        {
-            break;
-        }
-
-        if (str[i] == token)
-        {
-            ++pop;
-        }
-    }
-
-    return pop;
-}
-
-/*
-// Returns a pointer to the first instance of the given token [c] in string
-// [str], searching up to [n] characters, or NULL if not found. Does not work
-// well when searching for the NULL token.
-*/
-static const char * strnchr(const char * str, int c, size_t n)
-{
-    size_t i; 
-    for (i = 0; i < n; ++i)
-    {
-        if (*str == 0)
-        {
-            break;
-        }
-
-        if (*str == c)
-        {
-            return str;
-        }
-
-        ++str;
-    }
-
-    return NULL;
-}
-
-/*
-// This helper function echos back the user provided string according to the
-// echoing parameters.
-*/
 #define MAX_BUFFER_SIZE	256
 
-static ALT_STATUS_CODE alt_16550_buffer_echo(ALT_16550_BUFFER_t * buffer, const char * string, size_t size)
-{
-    ALT_STATUS_CODE status = ALT_E_SUCCESS;
-
-    char output[MAX_BUFFER_SIZE];
-    size_t size_left = size;
-
-    if (buffer->echo_char == 0)
-    {
-        /* Echoing back user's input. */
-
-        if (buffer->echo_inject_lf)
-        {
-            /* Inject a '\n' after every '\r' detected. */
-
-            while (size_left)
-            {
-                /* Loop one less than the [output] array. This is to allow for the case when the
-                   last character is a '\r', so the last '\n' will fit in. */
-                size_t write_size = 0;
-                uint32_t copy_size = stdminul(size_left, sizeof(output) - 1);
-                while (write_size < copy_size)
-                {
-                    output[write_size] = string[size - size_left];
-
-                    if (output[write_size] == ALT_CR_TOKEN)
-                    {
-                        ++write_size;
-                        output[write_size] = ALT_LF_TOKEN;
-                    }
-
-                    ++write_size;
-                    --size_left;
-                }
-
-                status = alt_16550_buffer_write_raw(buffer, output, write_size, &write_size);
-                if (status != ALT_E_SUCCESS)
-                {
-                    break;
-                }
-
-                /* size_left is already decremented as part of the injection loop. */
-            }
-        }
-        else /* if (buffer->echo_inject_lf) */
-        {
-            /* No injection requested. */
-
-            while (size_left)
-            {
-                size_t write_size = size_left;
-                status = alt_16550_buffer_write_raw(buffer, string + size - size_left, write_size, &write_size);
-                if (status != ALT_E_SUCCESS)
-                {
-                    break;
-                }
-
-                size_left -= write_size;
-            }
-        }
-    }
-    else /* if (buffer->echo_char == 0) */
-    {
-        /* Echo back a constant value. */
-
-        if (buffer->echo_inject_lf)
-        {
-            /* Inject '\n' after every '\r' detected. */
-
-            while (size_left)
-            {
-                /* Loop one less than the [output] array. This is to allow for the case when the */
-                /* last character is a '\r', so the last '\n' will fit in. */
-                size_t write_size = 0;
-                uint32_t copy_size = stdminul(size_left, sizeof(output) - 1);
-                while (write_size < copy_size)
-                {
-                    if (string[size - size_left] == ALT_CR_TOKEN)
-                    {
-                        output[write_size] = ALT_CR_TOKEN;
-                        ++write_size;
-                        output[write_size] = ALT_LF_TOKEN;
-                    }
-                    else
-                    {
-                        output[write_size] = buffer->echo_char;
-                    }
-
-                    ++write_size;
-                    --size_left;
-                }
-
-                status = alt_16550_buffer_write_raw(buffer, output, write_size, &write_size);
-                if (status != ALT_E_SUCCESS)
-                {
-                    break;
-                }
-
-                /* size_left is already decremented as part of the injection loop. */
-            }
-        }
-        else /* if (buffer->echo_inject_lf) */
-        {
-            /* No injection requested. */
-
-            /* Use a small buffer to paint out the received data so as to not */
-            /* constantly synchronize with the ISR. */
-            memset(output, buffer->echo_char, sizeof(output));
-
-            while (size_left)
-            {
-                size_t write_size = stdminul(size_left, sizeof(output));
-                status = alt_16550_buffer_write_raw(buffer, output, write_size, &write_size);
-                if (status != ALT_E_SUCCESS)
-                {
-                    break;
-                }
-
-                size_left -= write_size;
-            }
-        }
-    }
-
-    return status;
-}
 
 /*
 // Helper function to handle UART RX interrupts.
@@ -283,18 +103,6 @@ static ALT_STATUS_CODE alt_16550_buffer_int_rx(ALT_16550_BUFFER_t * buffer)
             status = alt_16550_fifo_read(buffer->handle,
                                          buffer->rx_buffer + wrapped_offset, copy_size);
         }
-
-        /* Scan for NL */
-        if (status == ALT_E_SUCCESS)
-        {
-            buffer->rx_nl_count += strnpop(buffer->rx_buffer + wrapped_offset, copy_size, ALT_CR_TOKEN);
-        }
-
-        /* Echo */
-        if ((status == ALT_E_SUCCESS) && (buffer->echo_enable == true))
-        {
-            status = alt_16550_buffer_echo(buffer, buffer->rx_buffer + wrapped_offset, copy_size);
-        }
     }
     else if (buffer->rx_start + buffer->rx_level + copy_size > ALT_16550_BUFFER_PROVISION_RX_BUFFER_SIZE)
     {
@@ -313,25 +121,6 @@ static ALT_STATUS_CODE alt_16550_buffer_int_rx(ALT_16550_BUFFER_t * buffer)
                                          buffer->rx_buffer, copy_size_2);
         }
 
-        /* Scan for NL */
-        if (status == ALT_E_SUCCESS)
-        {
-            buffer->rx_nl_count += strnpop(buffer->rx_buffer + buffer->rx_start + buffer->rx_level, copy_size_1, ALT_CR_TOKEN);
-            buffer->rx_nl_count += strnpop(buffer->rx_buffer, copy_size_2, ALT_CR_TOKEN);
-        }
-
-        /* Echo */
-        if (buffer->echo_enable == true)
-        {
-            if (status == ALT_E_SUCCESS)
-            {
-                status = alt_16550_buffer_echo(buffer, buffer->rx_buffer + buffer->rx_start + buffer->rx_level, copy_size_1);
-            }
-            if (status == ALT_E_SUCCESS)
-            {
-                status = alt_16550_buffer_echo(buffer, buffer->rx_buffer, copy_size_2);
-            }
-        }
     }
     else
     {
@@ -340,18 +129,6 @@ static ALT_STATUS_CODE alt_16550_buffer_int_rx(ALT_16550_BUFFER_t * buffer)
         {
             status = alt_16550_fifo_read(buffer->handle,
                                          buffer->rx_buffer + buffer->rx_start + buffer->rx_level, copy_size);
-        }
-
-        /* Scan for NL */
-        if (status == ALT_E_SUCCESS)
-        {
-            buffer->rx_nl_count += strnpop(buffer->rx_buffer + buffer->rx_start + buffer->rx_level, copy_size, ALT_CR_TOKEN);
-        }
-
-        /* Echo */
-        if ((status == ALT_E_SUCCESS) && (buffer->echo_enable == true))
-        {
-            status = alt_16550_buffer_echo(buffer, buffer->rx_buffer + buffer->rx_start + buffer->rx_level, copy_size);
         }
     }
 
@@ -397,6 +174,9 @@ static ALT_STATUS_CODE alt_16550_buffer_int_tx(ALT_16550_BUFFER_t * buffer)
     /* Copy the TX buffer into the TX FIFO. */
     copy_size = stdminul(buffer->fifo_size_tx - fifo_level_tx, buffer->tx_level);
 
+    if(copy_size) {
+    	SetLed(GPIO_LED4, 1);
+    }
     if (buffer->tx_start + copy_size > ALT_16550_BUFFER_PROVISION_TX_BUFFER_SIZE)
     {
         /* Wrapping */
@@ -436,9 +216,15 @@ static ALT_STATUS_CODE alt_16550_buffer_int_tx(ALT_16550_BUFFER_t * buffer)
         }
     }
 
+    if(copy_size) {
+    	SetLed(GPIO_LED4, 0);
+    }
     if (status == ALT_E_SUCCESS)
     {
         buffer->tx_level -= copy_size;
+    }
+    else {
+    	SetLed(GPIO_LED6, 1);
     }
 
 #if ALT_16550_BUFFER_ENABLE_SMP
@@ -492,7 +278,9 @@ static ALT_STATUS_CODE alt_16550_buffer_int_line(ALT_16550_BUFFER_t * buffer)
             status = ALT_E_UART_RFE;
         }
     }
-
+    if(ALT_E_SUCCESS != status) {
+    	SetLed(GPIO_LED6,1);
+    }
     return status;
 }
 
@@ -558,13 +346,9 @@ ALT_STATUS_CODE alt_16550_buffer_init(ALT_16550_BUFFER_t * buffer,
 
     buffer->rx_start    = 0;
     buffer->rx_level    = 0;
-    buffer->rx_nl_count = 0;
 
     buffer->tx_start = 0;
     buffer->tx_level = 0;
-
-    buffer->echo_enable = false;
-    buffer->echo_char   = 0;
 
     /* Turn on FIFOs */
     if (status == ALT_E_SUCCESS)
@@ -854,175 +638,8 @@ ALT_STATUS_CODE alt_16550_buffer_read_raw(ALT_16550_BUFFER_t * buffer,
             }
         }
 
-        /* Decrease population of NL found */
-        buffer->rx_nl_count -= strnpop(data, copy_size, ALT_CR_TOKEN);
-
         buffer->rx_level -= copy_size;
         *size_read = copy_size;
-    }
-
-    /* Now that there is some empty space in the buffer, enable RX interrupts. */
-    if (status == ALT_E_SUCCESS)
-    {
-        status = alt_16550_int_enable_rx(buffer->handle);
-    }
-
-    return status;
-}
-
-ALT_STATUS_CODE alt_16550_buffer_read_line(ALT_16550_BUFFER_t * buffer,
-                                           char * data,
-                                           size_t size,
-                                           size_t * size_read)
-{
-    ALT_STATUS_CODE status = ALT_E_SUCCESS;
-
-    /* Copy size needed to copy up to and including the next NL. */
-    uint32_t size_nl = 0;
-
-    /* Report ISR error if any. */
-    if (buffer->status != ALT_E_SUCCESS)
-    {
-        return buffer->status;
-    }
-
-    /* User requested a 0-sized read or there is no data in the buffer to read, or no NL to read. */
-    if ((size == 0) || (buffer->rx_level == 0) || (buffer->rx_nl_count == 0))
-    {
-        *size_read = 0;
-        return ALT_E_SUCCESS;
-    }
-
-    /* Disable RX ISR */
-    if (status == ALT_E_SUCCESS)
-    {
-        status = alt_16550_int_disable_rx(buffer->handle);
-    }
-
-#if ALT_16550_BUFFER_ENABLE_SMP
-    /* Wait for the ISR to exit the RX section */
-    /* This is only really needed in multi-CPU systems. */
-    if (status == ALT_E_SUCCESS)
-    {
-        int i = 10000;
-        while (--i)
-        {
-            if (!buffer->isr_rx)
-            {
-                break;
-            }
-        }
-
-        if (i == 0)
-        {
-            status = ALT_E_TMO;
-        }
-    }
-#endif
-
-    /* Locate the next position of the NL */
-    if (status == ALT_E_SUCCESS)
-    {
-        /* Scan size. Don't search the buffer more than the size requested. */
-        uint32_t scan_nl = stdminul(size, buffer->rx_level);
-
-        /* Pointer to the NL within the string. */
-        const char * search_nl = NULL;
-
-        if (buffer->rx_start + scan_nl > ALT_16550_BUFFER_PROVISION_RX_BUFFER_SIZE)
-        {
-            /* Wrapping */
-            uint32_t scan_nl_2 = buffer->rx_start + scan_nl - ALT_16550_BUFFER_PROVISION_RX_BUFFER_SIZE;
-            uint32_t scan_nl_1 = scan_nl - scan_nl_2;
-
-            if ((search_nl = strnchr(buffer->rx_buffer + buffer->rx_start, ALT_CR_TOKEN, scan_nl_1)) != NULL)
-            {
-                /* The NL is in the first section.
-                // +1 because we want to copy including the NL at [i]. */
-                size_nl = search_nl - (buffer->rx_buffer + buffer->rx_start) + 1;
-            }
-            else if ((search_nl = strnchr(buffer->rx_buffer, ALT_CR_TOKEN, scan_nl_2)) != NULL)
-            {
-                /* The NL is in the wrapped section. */
-                size_nl = scan_nl_1 + (search_nl - buffer->rx_buffer) + 1;
-            }
-        }
-        else
-        {
-            /* No wrap */
-            if ((search_nl = strnchr(buffer->rx_buffer + buffer->rx_start, ALT_CR_TOKEN, scan_nl)) != NULL)
-            {
-                /* +1 because we want to copy including the NL at [i]. */
-                size_nl = search_nl - (buffer->rx_buffer + buffer->rx_start) + 1;
-            }
-        }
-
-        if (size_nl == 0)
-        {
-            if (buffer->rx_level < ALT_16550_BUFFER_PROVISION_RX_BUFFER_SIZE)
-            {
-                alt_16550_int_enable_rx(buffer->handle);
-            }
-
-            /* The copy required for the string up to the NL is larger than the buffer provided by caller. */
-            status = ALT_E_BUF_OVF;
-        }
-    }
-
-    /* Copy out the read buffer into the user buffer. */
-    if (status == ALT_E_SUCCESS)
-    {
-        if (buffer->rx_start + size_nl > ALT_16550_BUFFER_PROVISION_RX_BUFFER_SIZE)
-        {
-            uint32_t i;
-            /* Wrapping */
-            uint32_t copy_size_2 = buffer->rx_start + size_nl - ALT_16550_BUFFER_PROVISION_RX_BUFFER_SIZE;
-            uint32_t copy_size_1 = size_nl - copy_size_2;
-
-            char * ptr = buffer->rx_buffer + buffer->rx_start;
-            for (i = 0; i < copy_size_1; i++)
-            {
-               *data = *ptr;
-               data++;
-               ptr++;
-            }
-
-            data = data+copy_size_1;
-            ptr = buffer->rx_buffer;
-            for (i = 0; i < copy_size_2; i++)
-            {
-               *data = *ptr;
-               data++;
-               ptr++;
-            }
-
-            buffer->rx_start = copy_size_2;
-        }
-        else
-        {
-            uint32_t i;
-            /* No wrapping */
-            char * ptr = buffer->rx_buffer + buffer->rx_start;
-            for (i = 0; i < size_nl; i++)
-            {
-               *data = *ptr;
-               data++;
-               ptr++;
-            }
-
-            buffer->rx_start += size_nl;
-            if (buffer->rx_start == ALT_16550_BUFFER_PROVISION_RX_BUFFER_SIZE)
-            {
-                buffer->rx_start = 0;
-            }
-        }
-
-        /* Decrease population of NL found. */
-        /* This is always 1 as we are reading up to the next NL. */
-        --buffer->rx_nl_count;
-
-        buffer->rx_level -= size_nl;
-        *size_read = size_nl;
     }
 
     /* Now that there is some empty space in the buffer, enable RX interrupts. */
@@ -1040,6 +657,7 @@ ALT_STATUS_CODE alt_16550_buffer_write_raw(ALT_16550_BUFFER_t * buffer,
                                            size_t * size_written)
 {
     ALT_STATUS_CODE status = ALT_E_SUCCESS;
+    const char * data_start = data;
 
     /* Report ISR error if any. */
     if (buffer->status != ALT_E_SUCCESS)
@@ -1103,7 +721,7 @@ ALT_STATUS_CODE alt_16550_buffer_write_raw(ALT_16550_BUFFER_t * buffer,
         }
         else if (buffer->tx_start + buffer->tx_level + copy_size > ALT_16550_BUFFER_PROVISION_TX_BUFFER_SIZE)
         {
-            /* Will wrap */
+            /* Will wrap -- copy_size_2 is "excess" data to be wrapped*/
             uint32_t copy_size_2 = buffer->tx_start + buffer->tx_level + copy_size - ALT_16550_BUFFER_PROVISION_TX_BUFFER_SIZE;
             uint32_t copy_size_1 = copy_size - copy_size_2;
 
@@ -1115,7 +733,7 @@ ALT_STATUS_CODE alt_16550_buffer_write_raw(ALT_16550_BUFFER_t * buffer,
                ptr++;
             }
 
-            data = data + copy_size_1;
+            //data = data + copy_size_1;
             ptr = buffer->tx_buffer;
             for (i = 0; i < copy_size_2; i++)
             {
@@ -1148,85 +766,9 @@ ALT_STATUS_CODE alt_16550_buffer_write_raw(ALT_16550_BUFFER_t * buffer,
         status = alt_16550_int_enable_tx(buffer->handle);
     }
 #endif
+    if(data > (data_start + size)) {
+    	failExit("tx buffer corruption!");
+    }
     return status;
 }
 
-ALT_STATUS_CODE alt_16550_buffer_write_line(ALT_16550_BUFFER_t * buffer,
-                                            const char * data,
-                                            size_t size,
-                                            size_t * size_written)
-{
-    ALT_STATUS_CODE status = ALT_E_SUCCESS;
-    size_t size_left;
-
-
-    /* Report ISR error if any. */
-    if (buffer->status != ALT_E_SUCCESS)
-    {
-        return buffer->status;
-    }
-
-    if (size == 0)
-    {
-        size = strlen(data);
-    }
-
-    *size_written = 0;
-    size_left = size;
-
-    while (size_left > 0)
-    {
-        char output[MAX_BUFFER_SIZE];
-
-        size_t write_size = 0;
-        uint32_t copy_size = stdminul(size_left, sizeof(output) - 1);
-
-        if (status != ALT_E_SUCCESS)
-        {
-            break;
-        }
-
-        while (write_size < copy_size)
-        {
-            if (data[size - size_left] == '\n')
-            {
-                output[write_size] = '\r';
-                ++write_size;
-                output[write_size] = '\n';
-            }
-            else
-            {
-                output[write_size] = data[size - size_left];
-            }
-
-            ++write_size;
-            --size_left;
-        }
-
-        status = alt_16550_buffer_write_raw(buffer,
-                                            output, write_size,
-                                            &write_size);
-        if (status == ALT_E_SUCCESS)
-        {
-            *size_written += write_size;
-        }
-    }
-
-    return status;
-}
-
-ALT_STATUS_CODE alt_16550_buffer_echo_enable(ALT_16550_BUFFER_t * buffer,
-                                             bool inject_lf,
-                                             char echo)
-{
-    buffer->echo_enable    = true;
-    buffer->echo_inject_lf = inject_lf;
-    buffer->echo_char      = echo;
-    return ALT_E_SUCCESS;
-}
-
-ALT_STATUS_CODE alt_16550_buffer_echo_disable(ALT_16550_BUFFER_t * buffer)
-{
-    buffer->echo_enable = false;
-    return ALT_E_SUCCESS;
-}
