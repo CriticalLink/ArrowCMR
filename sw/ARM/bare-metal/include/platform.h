@@ -56,10 +56,10 @@ sfeStatus_t platformInit(void);
 // All on GPIO_PORTB
 #define GPIO_LED1 ALT_GPIO_BIT21 // uart_send
 #define GPIO_LED2 ALT_GPIO_BIT20 // PwmIsr toggle
-#define GPIO_LED3 ALT_GPIO_BIT19 // sMcAlgorithm progress
+#define GPIO_LED3 ALT_GPIO_BIT19 // OK to capture
 #define GPIO_LED4 ALT_GPIO_BIT15 // SincDataIsr
 #define GPIO_LED5 ALT_GPIO_BIT11 // app init (in main), dump_buffer_to_uart
-#define GPIO_LED6 ALT_GPIO_BIT12 // alt_16550_buffer_int_tx
+#define GPIO_LED6 ALT_GPIO_BIT12 // Error indicator
 #define GPIO_LED7 ALT_GPIO_BIT13 // sMcAlgoritm gate
 
 #define GPIO_SW3 ALT_GPIO_BIT27

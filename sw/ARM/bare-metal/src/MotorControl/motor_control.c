@@ -195,20 +195,14 @@ void sMcAlgorithm(void){
   qep_dir_monitor = (int8_t)PMSMctrl_U.ROT_DIR_meas;
     
   /* Step the model for base rate */
-  SetLed(GPIO_LED3,1);
   PMSMctrl_step0();
-  SetLed(GPIO_LED3,0);
   
   if ((taskCounter[1] == 0))
     eventFlags[1] = true;
   
   if (eventFlags[1]) {  /* Step the model for subrate 1 */
-    SetLed(GPIO_LED3,1);
     PMSMctrl_step1();
-    SetLed(GPIO_LED3,0);
-    SetLed(GPIO_LED3,1);
     sAppTask();
-    SetLed(GPIO_LED3,0);
     eventFlags[1] = false;  /* Indicate task complete for subrate */
   }
   
@@ -226,9 +220,7 @@ void sMcAlgorithm(void){
 
   SetDuty(&ref);
   // AdiMonitor must be called from here is it collects realtime data
-  SetLed(GPIO_LED3,1);
   AdiMonitor();  // Call monitor program to capture data
-  SetLed(GPIO_LED3,0);
   alt_int_global_enable_all();
   SetLed(GPIO_LED7, 0);
 }

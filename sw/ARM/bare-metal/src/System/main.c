@@ -63,18 +63,20 @@ int main(void){
 
 	aAppInit();
 
-	for(int ii = 0; ii < 100; ++ii) {
-		TOGGLE_LED(GPIO_LED2);
-		checkTxBuffer();
-	}
+//	for(int ii = 0; ii < 100; ++ii) {
+//		TOGGLE_LED(GPIO_LED2);
+//		checkTxBuffer();
+//	}
 
 	// disable console so as to not corrupt uart with logging
 	enable_console(0);
 
 	while(1){
-		TOGGLE_LED(GPIO_LED2);
+		//TOGGLE_LED(GPIO_LED2);
 		checkRxUart();
+#ifndef HAVE_UART_TX_INT
 		checkTxBuffer();
+#endif
 		cnt++;
 	}
 	return 1;

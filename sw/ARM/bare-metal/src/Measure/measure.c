@@ -100,7 +100,7 @@ void SincDataIsr(uint32_t icciar, void* context){
 
 	  Sinc0DataEvent++;
 
-	  //SetLed(GPIO_LED4, 1);
+	  SetLed(GPIO_LED4, 1);
       sinc0_latest = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_DATA_LATEST);
 	  sinc1_latest = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_DATA_LATEST);
 	  sinc1_synced = (uint16_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_DATA_SYNCED);
@@ -111,7 +111,7 @@ void SincDataIsr(uint32_t icciar, void* context){
 
 	  sinc0_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC0_TRIP); // Just for debugging. Not used for anything
 	  sinc1_trip = (uint8_t)SINC_FLUSH_TRIP_IP_mReadReg(SINC_BASE, SINC1_TRIP); // Just for debugging. Not used for anything
-	  //SetLed(GPIO_LED4, 0);
+	  SetLed(GPIO_LED4, 0);
 
 	  if(GetMode() != MODE4)
 	    sMcAlgorithm();
