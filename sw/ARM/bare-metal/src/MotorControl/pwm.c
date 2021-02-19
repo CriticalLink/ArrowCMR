@@ -16,13 +16,12 @@ Description:
 #include <pwm.h>
 #include "motor_control.h"
 #include <stdio.h>
+#include "platform.h"
 
 #include <alt_interrupt.h>
 #include <alt_generalpurpose_io.h>
 
 /*=============  D E F I N E S   =============*/
-#define PWM_IRQ_BASE 0xFF201000
-#define PWM_IRQ_ID ALT_INT_INTERRUPT_F2S_FPGA_IRQ4	
 #define REG_IRQ_EN 16 
 #define REG_IRQ_ACK 17 
 #define REG_IRQ_PEN 17 
@@ -49,8 +48,6 @@ Description:
 #define REG_TRIP_CLEAR 12
 #define REG_PWM_STATUS 13 
 
-/* 	Define the base memory address of PWM IP core */
-#define PWM_BASE 0xFF201000
 
 #define LED_PIN	0	/* The MIO connected to the PS is GPIO 50 */
 #define LED_CNT_MAX 5000
@@ -101,16 +98,14 @@ void PwmIsr(uint32_t icciar, void* context) {
 
 	  if(led_count==LED_CNT_MAX){
 		irq_led = !irq_led;
-		// LED2
-                if (irq_led) {
-                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT20, 0);
-                } else {
-                  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT20, ALT_GPIO_BIT20);
-                }
+		SetLed(GPIO_LED2, irq_led);
 		led_count=0;
 	  }
 
 	  SyncEvent++;
+	  
+	  if(GetMode() == MODE4)
+	    sMcAlgorithm();
 
 	  PWM_IP_mWriteReg(PWM_IRQ_BASE, REG_IRQ_ACK, BITM_PWM_SYNC_IRQ);
 
@@ -309,6 +304,10 @@ void SetupPwmIrq(void){
   alt_int_isr_register(PWM_IRQ_ID, PwmIsr, NULL);
   int target = 0x1; /* 1 = CPU0, 2=CPU1 */ 
   alt_int_dist_target_set(PWM_IRQ_ID, target);
+#ifdef SET_IRQ_PRIORITY
+  // Configure the IRQ priority
+  alt_int_dist_priority_set(PWM_IRQ_ID, MOTOR_PWM_IRQ_PRIORITY);
+#endif
   alt_int_dist_enable(PWM_IRQ_ID);
 
   PWM_IP_mWriteReg(PWM_IRQ_BASE, REG_IRQ_EN, 0x3);

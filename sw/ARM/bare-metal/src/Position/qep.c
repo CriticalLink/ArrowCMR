@@ -15,9 +15,9 @@ Description:
 /*=============  I N C L U D E S   =============*/
 #include <stdint.h>
 #include "rtwtypes.h"
+#include "platform.h"
 
 /*=============  D E F I N E S   =============*/
-#define QEP_BASE 0xFF202000
 
 // M -> S
 #define REG_QEP_CONFIG 0
@@ -43,7 +43,7 @@ Description:
 
 // Minimum pulse-width filter on ABZ and Hall UVW lines
 #define MPW_CNT_LIM     256    // 2.56 us @ 100 MHz clock
-#define CNT_WRAP 		0xFFFFFFFF
+#define CNT_WRAP 		3999
 #define M 				4
 
 void QEP_IP_mWriteReg(uint32_t base, uint32_t offset, uint32_t val) { 

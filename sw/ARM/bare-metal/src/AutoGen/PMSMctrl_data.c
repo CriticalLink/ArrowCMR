@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'PMSMctrl'.
  *
- * Model version                  : 1.2742
- * Simulink Coder version         : 9.0 (R2018b) 24-May-2018
- * C/C++ source code generated on : Tue Oct 15 10:57:10 2019
+ * Model version                  : 1.2793
+ * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
+ * C/C++ source code generated on : Tue Nov 10 09:03:44 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -23,14 +23,14 @@
 /* Block parameters (default storage) */
 Parameters_PMSMctrl PMSMctrl_P = {
   /* Variable: Kiw
-   * Referenced by: '<S86>/Integral Gain'
+   * Referenced by: '<S68>/Integral Gain'
    */
-  0.02F,
+  0.12F,
 
   /* Variable: Kpw
-   * Referenced by: '<S113>/Proportional Gain'
+   * Referenced by: '<S76>/Proportional Gain'
    */
-  0.001F,
+  0.005F,
 
   /* Variable: MBC_ID
    * Referenced by: '<S1>/SYS_CMD1'
@@ -48,14 +48,14 @@ Parameters_PMSMctrl PMSMctrl_P = {
   0.0F,
 
   /* Variable: SpdSlewRateNeg
-   * Referenced by: '<S39>/Saturation'
+   * Referenced by: '<S38>/Saturation'
    */
-  -2.0F,
+  -1.0F,
 
   /* Variable: SpdSlewRatePos
-   * Referenced by: '<S39>/Saturation'
+   * Referenced by: '<S38>/Saturation'
    */
-  2.0F,
+  1.0F,
 
   /* Variable: iabcOffset
    * Referenced by: '<S8>/Constant'
@@ -65,19 +65,19 @@ Parameters_PMSMctrl PMSMctrl_P = {
   /* Variable: iabcScale
    * Referenced by: '<S8>/Gain'
    */
-  0.000190734863F,
+  0.000207519537F,
 
   /* Variable: iqMax
    * Referenced by:
-   *   '<S69>/DeadZone'
-   *   '<S117>/Saturation'
+   *   '<S64>/DeadZone'
+   *   '<S78>/Saturation'
    */
   2.0F,
 
   /* Variable: iqMin
    * Referenced by:
-   *   '<S69>/DeadZone'
-   *   '<S117>/Saturation'
+   *   '<S64>/DeadZone'
+   *   '<S78>/Saturation'
    */
   -2.0F,
 
@@ -95,9 +95,9 @@ Parameters_PMSMctrl PMSMctrl_P = {
    * Referenced by:
    *   '<S10>/MAX_RPM'
    *   '<S14>/MAX_RPM'
-   *   '<S140>/MAX_RPM'
+   *   '<S88>/MAX_RPM'
    */
-  2000,
+  3000,
 
   /* Variable: SPEED_REF
    * Referenced by: '<S1>/SPEED_REF'
@@ -105,14 +105,14 @@ Parameters_PMSMctrl PMSMctrl_P = {
   1000,
 
   /* Variable: VF_MAX_RATE
-   * Referenced by: '<S140>/VF_MAX_RATE'
+   * Referenced by: '<S88>/VF_MAX_RATE'
    */
   10,
 
   /* Variable: MOTOR_CFG
    * Referenced by: '<S1>/SYS_CMD2'
    */
-  4U,
+  5U,
 
   /* Variable: POS_RST
    * Referenced by: '<S1>/POS_RST'
@@ -142,7 +142,7 @@ Parameters_PMSMctrl PMSMctrl_P = {
   /* Variable: VF_GAIN
    * Referenced by: '<S1>/VF_GAIN'
    */
-  32U
+  22U
 };
 
 /* Constant parameters (default storage) */
@@ -157,6 +157,7 @@ const ConstParam_PMSMctrl PMSMctrl_ConstP = {
    *   '<S8>/sinc_cmd'
    *   '<S8>/Switch1'
    *   '<S14>/Manual Switch'
+   *   '<S14>/Manual Switch1'
    *   '<S16>/Switch1'
    *   '<S16>/Switch2'
    *   '<S17>/Switch'

@@ -21,6 +21,7 @@ Description:
 #include <measure.h>
 #include <qep.h>
 #include <alt_generalpurpose_io.h>
+#include <alt_interrupt.h>
 
 /*=============  D E F I N E S   =============*/
 
@@ -37,6 +38,8 @@ uint32_t size_check_t = sizeof(size_check_t);
 uint32_T size_check_T = sizeof(size_check_T);
 
 uint16_t ext_trip_cnt=0, sinc0_trip_cnt=0, sinc1_trip_cnt=0;
+
+MODE_TYPE mode_act=MODE0;
 
 /*=============  C O D E  =============*/
 void aMcInit(void){
@@ -56,6 +59,39 @@ void aMcInit(void){
   PMSMctrl_initialize();   // Init of MBC
 }
 
+void aMcModeHandler(MODE_TYPE mode_cmd){
+
+  if(PMSMctrl_P.SYSTEM_CMD == 0){  // Only change settings if motor is stopped
+
+	mode_act = mode_cmd;
+
+	if(mode_cmd == MODE0) {
+		PMSMctrl_P.VF_CTRL = 0;
+		SetupSincOptFlush();
+	}
+	else if(mode_cmd == MODE1) {
+		PMSMctrl_P.VF_CTRL = 1;
+		SetupSincOptFlush();
+	}
+	else if(mode_cmd == MODE2){
+		PMSMctrl_P.VF_CTRL = 2;
+		SetupSincOptFlush();
+	}
+	else if(mode_cmd == MODE3){
+		PMSMctrl_P.VF_CTRL = 1;
+		SetupSincOptContinious();
+	}
+	else if(mode_cmd == MODE4){
+		PMSMctrl_P.VF_CTRL = 1;
+		SetupSincNonOptContinious();
+	}
+  }
+}
+
+MODE_TYPE GetMode(void){
+	return mode_act;
+}
+
 void aMcCmd(MC_EVENT command){
 /*****************************************************************************
   Function: aMcInit
@@ -70,7 +106,7 @@ void aMcCmd(MC_EVENT command){
   switch (command){
   case eMC_START:
 	  EnablePWM();
-	  EnableSincTrip();
+	  //EnableSincTrip();
     break;
   case eMC_STOP:
 	  DisablePWM();
@@ -139,7 +175,8 @@ void sMcAlgorithm(void){
   static boolean_T eventFlags[2] = { 0, 0 };/* Model has 2 rates */
   static uint16_t taskCounter[2] = { 0, 0 };
   duty_type ref;
-
+  alt_int_global_disable_all();
+  SetLed(GPIO_LED7, 1);
   PMSMctrl_U.Vdc_adc = 24.0;
   PMSMctrl_U.ibc_sinc[1] = GetSincData(0);
   PMSMctrl_U.ibc_sinc[0] = GetSincData(1);
@@ -158,28 +195,12 @@ void sMcAlgorithm(void){
   qep_dir_monitor = (int8_t)PMSMctrl_U.ROT_DIR_meas;
     
   /* Step the model for base rate */
-  static bool gpio7_state = false;
-  gpio7_state = !gpio7_state;
-  if (gpio7_state) {
-    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT13, 0);
-  } else {
-    alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT13, ALT_GPIO_BIT13);
-  }
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT19, ALT_GPIO_BIT19);
   PMSMctrl_step0();
-  alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT19, 0);
   
   if ((taskCounter[1] == 0))
     eventFlags[1] = true;
   
   if (eventFlags[1]) {  /* Step the model for subrate 1 */
-    static bool gpio6_state = false;
-    gpio6_state = !gpio6_state;
-    if (gpio6_state) {
-      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT12, 0);
-    } else {
-      alt_gpio_port_datadir_set(ALT_GPIO_PORTB, ALT_GPIO_BIT12, ALT_GPIO_BIT12);
-    }
     PMSMctrl_step1();
     sAppTask();
     eventFlags[1] = false;  /* Indicate task complete for subrate */
@@ -198,8 +219,10 @@ void sMcAlgorithm(void){
   ref.duty_c = duty_c;
 
   SetDuty(&ref);
-  
+  // AdiMonitor must be called from here is it collects realtime data
   AdiMonitor();  // Call monitor program to capture data
+  alt_int_global_enable_all();
+  SetLed(GPIO_LED7, 0);
 }
 /* End Of File */
 

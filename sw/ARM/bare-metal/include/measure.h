@@ -21,4 +21,9 @@ uint16_t GetSincData(uint8_t);
 void EnableSincTrip(void);
 void ClearSincTrip(void);
 
+void SetupSincOptFlush(void);
+void SetupSincNonOptFlush(void);
+void SetupSincOptContinious(void);
+void SetupSincNonOptContinious(void);
+
 /*=============  EXTERNAL VARIABLES  =============*/

@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'PMSMctrl'.
  *
- * Model version                  : 1.2742
- * Simulink Coder version         : 9.0 (R2018b) 24-May-2018
- * C/C++ source code generated on : Tue Oct 15 10:57:10 2019
+ * Model version                  : 1.2793
+ * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
+ * C/C++ source code generated on : Tue Nov 10 09:03:44 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex

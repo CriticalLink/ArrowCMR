@@ -18,14 +18,20 @@ on one of the A9s.
 #include <PMSMctrl.h>          // Header file of auto generated code
 #include "platform.h"
 #include "application.h"
+#include "motor_control.h"
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "socal/alt_uart.h"
 #include "socal/hps.h"
 #include "socal/socal.h"
 
 #include <alt_interrupt.h>
+#include <alt_generalpurpose_io.h>
+#include "hwlib.h"
+#include "alt_16550_uart.h"
+#include "alt_16550_buffer.h"
 
 /*=============  D E F I N E S   =============*/
 
@@ -54,14 +60,16 @@ on one of the A9s.
 #define MOTOR_STOP		82
 #define SET_SPEED       90
 
-#define BAUD_RATE       57600
-
 typedef enum { AUTO,
                SINGLE } trigger_types;
 
 /*=============  P R O T O T Y P E S =============*/
 void dump_buffer_to_uart(void);
-void reset_monitor(void);
+static int NeedReset = 1;
+void reset_monitor(void) {
+	NeedReset = 1;
+}
+void do_reset_monitor(void);
 void RxISR(uint8_t);
 
 /*=============  D A T A  =============*/
@@ -83,7 +91,7 @@ uint16_t buffer_length = 1;
 uint16_t tx_buf_size = 1;
 uint16_t length_after_trig = 1;
 // Initialized to valid variable address so we can test readback more easily
-uint32_t adr_for_capture_variables[MAX_NO_OF_BUF] = {(uint32_t)&UART_RxIsrCounter};   /* Vector containing the address of the memory to monitor */
+volatile uint32_t adr_for_capture_variables[MAX_NO_OF_BUF] = {(uint32_t)&UART_RxIsrCounter};   /* Vector containing the address of the memory to monitor */
 uint8_t re_expect = RE_EXP_START;
 
 uint8_t triggered = 0;                     /* Current trigger status */
@@ -94,60 +102,9 @@ uint8_t GUI_READY = false;
 /* The following counters are used to determine when the entire buffer has been sent and received */
 volatile int TotalReceivedCount;
 volatile int TotalSentCount;
-int TotalErrorCount;
+static int TotalErrorCount=0;
 
-void Uart0Isr(uint32_t icciar, void* context) {
-/*****************************************************************************
-Function: Uart0Isr
-
-Parameters: N/A
-
-Returns: None
-
-Notes: This is a replacement for UartCallback, as the Altera UART does not
- have a higher level wrapper as the Xilinx one did.
-*****************************************************************************/
-
-  uint32_t lsr = alt_read_word(ALT_UART0_LSR_ADDR);
-
-  if (ALT_UART_LSR_DR_GET(lsr) == ALT_UART_LSR_DR_E_DATARDY) {
-    // Get all data from receive buffer
-    do {
-      UART_RxIsrCounter++;
-      RxISR(alt_read_word(ALT_UART0_RBR_THR_DLL_ADDR));
-    } while (ALT_UART_LSR_DR_GET(alt_read_word(ALT_UART0_LSR_ADDR)) == ALT_UART_LSR_DR_E_DATARDY);
-  }
-
-  if (ALT_UART_LSR_OE_GET(lsr) == ALT_UART_LSR_OE_E_OVERRUN) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_PE_GET(lsr) == ALT_UART_LSR_PE_E_PARITYERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_PE_GET(lsr) == ALT_UART_LSR_PE_E_PARITYERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_FE_GET(lsr) == ALT_UART_LSR_FE_E_FRMERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_FE_GET(lsr) == ALT_UART_LSR_FE_E_FRMERR) {
-    TotalErrorCount++;
-  }
-
-  if (ALT_UART_LSR_THRE_GET(lsr) == 1) {
-    UART_TxIsrCounter++;
-  }
-
-  if (ALT_UART_LSR_RFE_GET(lsr) == ALT_UART_LSR_RFE_E_ERR) {
-    TotalErrorCount++;
-  }
-}
-
-void aAdiMonitorInit(void){
+ALT_STATUS_CODE aAdiMonitorInit(void){
 /*****************************************************************************
 Function: aAdiMonitorInit
 
@@ -165,6 +122,7 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   start_idx = 1;
   UART_RxIsrCounter = 0;
   UART_TxIsrCounter = 0;
+  ALT_STATUS_CODE status =ALT_E_SUCCESS;
 
   //Configuration parameters
   dwn_smp_factor = 1;   // Down sampling factor
@@ -181,44 +139,32 @@ Notes: Setup of UART, ADIMonotor and IRQ controller.
   PMSMctrl_P.VF_BOOST = 0;
   PMSMctrl_P.MAX_RPM = 3000;
   PMSMctrl_P.VF_MAX_RATE = 10;
-  PMSMctrl_P.VF_CTRL = 0;
   PMSMctrl_P.ROT_DIR = 0;
   PMSMctrl_P.SPEED_REF = 0;
   PMSMctrl_P.POS_REF = 0;
-  PMSMctrl_P.iqMax = 2.0;
-  PMSMctrl_P.iqMin = -PMSMctrl_P.iqMax;
+  
+  aMcModeHandler(0);
 
-  printf("Motor Demo Bare Metal App starting.\r\n");
-  printf("Please connect to MATLAB application for further communications at 56700 baud rate.\r\n");
-
-  // Change UART baud rate from default (115200) to expected (57600):
-  // Make it so we have access to baud rate divisor
-  uint32_t lcr = alt_read_word(ALT_UART0_LCR_ADDR);
-  lcr |= ALT_UART_LCR_DLAB_SET_MSK;
-  alt_write_word(ALT_UART0_LCR_ADDR, lcr);
-  // Read baud rate divisor
-  uint32_t div = alt_read_word(ALT_UART0_RBR_THR_DLL_ADDR);
-  // Double baud rate divisor to take us from 115200 to 57600
-  alt_write_word(ALT_UART0_RBR_THR_DLL_ADDR, div*2);
-  // Disable access to baud rate divisor so that UART functions again
-  lcr &= ALT_UART_LCR_DLAB_CLR_MSK;
-  alt_write_word(ALT_UART0_LCR_ADDR, lcr);
-
-  // Setup interrupt for UART
-  alt_write_word(ALT_UART0_IER_DLH_ADDR, 0);
-
-  alt_int_isr_register(ALT_INT_INTERRUPT_UART0, Uart0Isr, NULL);
-  int target = 0x1; /* 1 = CPU0, 2=CPU1 */ 
-  alt_int_dist_target_set(ALT_INT_INTERRUPT_UART0, target);
-  alt_int_dist_enable(ALT_INT_INTERRUPT_UART0);
-
-  // Enable interrupts for UART
-  alt_write_word(ALT_UART0_IER_DLH_ADDR, ALT_UART_IER_DLH_ERBFI_DLH0_SET_MSK);
-
-  // Enable Tx and Rx FIFOs
-  alt_write_word(ALT_UART0_FCR_ADDR, ALT_UART_FCR_FIFOE_SET_MSK);
+  return status;
 }
 
+void checkRxUart(void) {
+    char read_buff[1];
+    size_t bytes_to_read = sizeof(read_buff);
+    size_t bytes_read = 0;
+    uint32_t bytes_available = 0;
+    alt_16550_buffer_level_rx(&g_uart0_buffer, &bytes_available);
+
+    while(bytes_available) {
+    	// check if data has been received from UART and process
+    	if(ALT_E_SUCCESS == alt_16550_buffer_read_raw(&g_uart0_buffer,read_buff, bytes_to_read, &bytes_read)) {
+    		if(bytes_to_read == bytes_read) {
+    			RxISR(read_buff[0]);
+    		}
+    	}
+    	--bytes_available;
+    }
+}
 void AdiMonitor(void){
 /*****************************************************************************
   Function: AdiMonitor
@@ -231,20 +177,26 @@ void AdiMonitor(void){
          rate after assignment of I/Os.
 *****************************************************************************/
     uint16_t i;
-    uint8_t *pointer_for_capture_variable;
+    volatile uint8_t *pointer_for_capture_variable;
 
-    if(CAPTURE_DATA && GUI_READY){  // Only capture when transmission is not in progress. If transmission in progress, just return.
+    int ok_to_capture = CAPTURE_DATA && GUI_READY;
+
+    if(NeedReset) {
+    	do_reset_monitor();
+    }
+    SetLed(GPIO_LED3,ok_to_capture);
+    if(ok_to_capture){  // Only capture when transmission is not in progress. If transmission in progress, just return.
       smp_cnt++;
       if(smp_cnt >= dwn_smp_factor){
         smp_cnt=0;
 
         for ( i=0; i < buf_no; i++){
-          pointer_for_capture_variable = (uint8_t *) adr_for_capture_variables[i];
-          monitor_tx_buf[capt_ptr] = *pointer_for_capture_variable; /* Capture data at the selected addresses */
-          buf_idx++;
-          capt_ptr++;
-          if(capt_ptr == TX_BUF_SIZE_MAX)
-            capt_ptr = 1;
+        	pointer_for_capture_variable = (volatile uint8_t *) adr_for_capture_variables[i];
+        	monitor_tx_buf[capt_ptr] = *pointer_for_capture_variable; /* Capture data at the selected addresses */
+        	buf_idx++;
+        	capt_ptr++;
+        	if(capt_ptr == TX_BUF_SIZE_MAX)
+        		capt_ptr = 1;
         }
 
         switch(trigger){
@@ -296,15 +248,14 @@ Notes: Call this function to trigger ADIMonitor in SINGLE mode
 }
 
 static void uart_send(const uint8_t* data, uint32_t numBytes) {
-  for (int idx = 0; idx < numBytes; idx++) {
-    // Make sure there is room in transmit FIFO
-    while(1 != ALT_UART_LSR_THRE_GET(alt_read_word(ALT_UART0_LSR_ADDR)))
-    {
-    }
 
-    // Write to transmit FIFO
-    alt_write_word(ALT_UART0_RBR_THR_DLL_ADDR, data[idx]);
-  }
+	size_t bytes_written = 0;
+	ALT_STATUS_CODE status = alt_16550_buffer_write_raw(&g_uart0_buffer, (char*)data, (size_t)numBytes, &bytes_written);
+	if(ALT_E_SUCCESS != status || (bytes_written != numBytes)) {
+		++TotalErrorCount;
+	}
+	if(0!=TotalErrorCount)
+		SetLed(GPIO_LED6, 1);
 }
 
 void dump_buffer_to_uart(void){
@@ -319,6 +270,7 @@ void dump_buffer_to_uart(void){
 *****************************************************************************/
   uint16_t idx = 1;
   uint16_t buffer_cnt = 1;
+  SetLed(GPIO_LED5, 1);
 
   CAPTURE_DATA = false;      // Tell monitor to stop capturing while transmit in going on.
   monitor_tx_buf[0]=0xAA;    // GUI expects 0xAA as first char.
@@ -341,6 +293,7 @@ void dump_buffer_to_uart(void){
   else{
     uart_send(monitor_tx_buf, tx_buf_size);
   }
+  SetLed(GPIO_LED5, 0);
 }
 
 void RxISR(uint8_t rx_data){
@@ -362,8 +315,9 @@ void RxISR(uint8_t rx_data){
 
   switch(re_expect){
     case RE_EXP_START:
-      if(rx_data==RE_EXP_START) 
+      if(rx_data==RE_EXP_START) {
          re_expect = RE_EXP_TYPE;	/* A start byte has been received */
+      }
     break;
 
     case RE_EXP_TYPE:
@@ -478,8 +432,8 @@ void RxISR(uint8_t rx_data){
               PMSMctrl_P.MAX_RPM = (max_rpm_temp<<8) + rx_data;
 	    else if (no_of_received_bytes == 6) 	//VF_MAX_RATE
               PMSMctrl_P.VF_MAX_RATE = rx_data;
-	    else if (no_of_received_bytes == 7)		// POLE_PAIR
-              PMSMctrl_P.VF_CTRL = rx_data;
+	    else if (no_of_received_bytes == 7)		// VF_CTRL
+	    	  aMcModeHandler(rx_data);
 	    else{									// ROT_DIR
 	        PMSMctrl_P.ROT_DIR = rx_data;
             re_expect = RE_EXP_START;
@@ -515,7 +469,6 @@ void RxISR(uint8_t rx_data){
     }
 }
 
-void reset_monitor(void){
 /*****************************************************************************
   Function: reset_monitor
 
@@ -524,6 +477,8 @@ void reset_monitor(void){
   Returns: None
 
 *****************************************************************************/
+void do_reset_monitor(void){
+  NeedReset = 0;
   buf_idx = 1;
   smp_cnt = 0;
   capt_ptr = 1;
@@ -532,7 +487,12 @@ void reset_monitor(void){
   monitor_tx_buf[0]=0xAA;
   monitor_tx_buf_reshuffled[0]=0xAA;
   ready_for_trigger = 0;
+  re_expect = RE_EXP_START;
 
+  for(int ii = 1; ii < TX_BUF_SIZE_MAX; ++ii) {
+	  monitor_tx_buf[ii] = 10.0;
+	    monitor_tx_buf_reshuffled[ii] = 20.0;
+  }
   if (buf_no > MAX_NO_OF_BUF)
     buf_no = MAX_NO_OF_BUF;
 
@@ -548,4 +508,16 @@ void reset_monitor(void){
     buffer_length = (TX_BUF_SIZE_MAX - MAX_NO_OF_BUF)/buf_no;
     tx_buf_size = buf_no * buffer_length + 1;
   }
+}
+
+
+void checkTxBuffer(void)
+{
+	uint32_t level = 0;
+	ALT_STATUS_CODE status = alt_16550_buffer_level_tx(&g_uart0_buffer, &level);
+	if(status == ALT_E_SUCCESS) {
+		if (level > 0) {
+			status = alt_16550_do_tx(&g_uart0_buffer);
+		}
+	}
 }

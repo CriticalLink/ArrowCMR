@@ -17,6 +17,7 @@ Description:
 #include <PMSMctrl.h>          // Header file of auto generated code
 #include <ADIMonitor.h>
 #include "platform.h"
+#include <alt_generalpurpose_io.h>
 
 /*=============  P R O T O T Y P E S  =============*/
 // Local functions
@@ -43,8 +44,12 @@ void aAppInit(void){
 
 *****************************************************************************/ 
   state_function = &StateFcnStopped;
-  aAdiMonitorInit();
-  aMcInit();
+  if(ALT_E_SUCCESS == aAdiMonitorInit()) {
+	  aMcInit();
+  }
+  else {
+	  failExit("aAdiMonitorInit() failed");
+  }
 }
 
 void aAppCmd(APP_EVENT event){

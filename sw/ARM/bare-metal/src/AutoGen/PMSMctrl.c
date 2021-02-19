@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'PMSMctrl'.
  *
- * Model version                  : 1.2742
- * Simulink Coder version         : 9.0 (R2018b) 24-May-2018
- * C/C++ source code generated on : Tue Oct 15 10:57:10 2019
+ * Model version                  : 1.2793
+ * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
+ * C/C++ source code generated on : Tue Nov 10 09:03:44 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -21,7 +21,7 @@
 #include "PMSMctrl_private.h"
 
 /* Named constants for MATLAB Function: '<S7>/MATLAB Function1' */
-#define PMSMctrl_EncoderPulses         (10000.0F)
+#define PMSMctrl_EncoderPulses         (4000.0F)
 
 /* Named constants for MATLAB Function: '<S14>/MATLAB Function' */
 #define PMSMctrl_GainMax               (1.0F)
@@ -38,7 +38,8 @@ real32_T theta_enc_mul;                /* '<S7>/Gain3' */
 real32_T speed_ff;                     /* '<S1>/SPEED_REF2' */
 real32_T Nref;                         /* '<S10>/MAX_RPM' */
 real32_T speed_ref;                    /* '<S11>/Switch3' */
-real32_T speed_ref_lim;                /* '<S39>/Sum' */
+real32_T w_ref;                        /* '<S14>/Manual Switch1' */
+real32_T speed_ref_lim;                /* '<S38>/Sum' */
 real32_T spd_fil_calc;                 /* '<S1>/Rate Transition1' */
 real32_T spd_raw_n_by_m;               /* '<S7>/Product1' */
 real32_T spd_fil_n_by_m;               /* '<S20>/Discrete State-Space' */
@@ -46,27 +47,29 @@ real32_T spd_raw_n_by_1;               /* '<S7>/Product3' */
 real32_T spd_fil_n_by_1;               /* '<S7>/Gain4' */
 real32_T speed_fil;                    /* '<S15>/Switch2' */
 real32_T iq_ref;                       /* '<S14>/Manual Switch' */
-real32_T theta_vf;                     /* '<S139>/Data Type Conversion' */
+real32_T theta_vf;                     /* '<S87>/Data Type Conversion' */
 real32_T theta_enc;                    /* '<S7>/Gain1' */
-real32_T id;                           /* '<S141>/Fcn2' */
-real32_T iq;                           /* '<S141>/Fcn1' */
-real32_T theta_speed;                  /* '<S2>/Rate Transition1' */
+real32_T id;                           /* '<S89>/Fcn2' */
+real32_T iq;                           /* '<S89>/Fcn1' */
 real32_T n_by_m_fil_debug;             /* '<S7>/Gain10' */
 real32_T n_by_m_raw_debug;             /* '<S7>/Gain2' */
-real32_T ia_sar;                       /* '<S31>/Gain3' */
-real32_T ib_sar;                       /* '<S31>/Gain6' */
-real32_T ic_sar;                       /* '<S31>/Gain7' */
-real32_T ic_sinc;                      /* '<S32>/Gain10' */
-real32_T ia_sinc;                      /* '<S32>/Gain8' */
-real32_T ib_sinc;                      /* '<S32>/Gain9' */
+real32_T ia_sar;                       /* '<S30>/Gain3' */
+real32_T ib_sar;                       /* '<S30>/Gain6' */
+real32_T ic_sar;                       /* '<S30>/Gain7' */
+real32_T ic_sinc;                      /* '<S31>/Gain10' */
+real32_T ia_sinc;                      /* '<S31>/Gain8' */
+real32_T ib_sinc;                      /* '<S31>/Gain9' */
 real32_T Vdc;                          /* '<S8>/Gain1' */
 real32_T spd_raw_calc;                 /* '<S1>/Rate Transition2' */
 real32_T speed_raw;                    /* '<S15>/Switch1' */
+real32_T theta_speed;                  /* '<S2>/Rate Transition1' */
+real32_T w_step;                       /* '<S14>/MATLAB Function2' */
 real32_T iq_ref_step;                  /* '<S14>/MATLAB Function1' */
 real32_T speed_debug;                  /* '<S13>/MATLAB Function' */
 real32_T pos_offset;                   /* '<S7>/MATLAB Function3' */
 real32_T speed_meas_raw_n_by_1;        /* '<S7>/MATLAB Function2' */
 real32_T speed_meas_raw_n_by_m;        /* '<S7>/MATLAB Function1' */
+uint16_T theta_qep_cnt;                /* '<S8>/Data Type Conversion3' */
 
 /* Block signals (default storage) */
 BlockIO_PMSMctrl PMSMctrl_B;
@@ -209,18 +212,16 @@ real32_T rt_roundf(real32_T u)
 void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
 {
   real32_T multi_out;
-  static const int16_T b[6] = { 60, 300, 0, 180, 120, 240 };
-
-  static const int16_T c[6] = { 210, 270, 330, 30, 90, 150 };
-
+  int32_T ref;
   uint32_T cnt_temp;
   real32_T cosOut;
   int16_T tmp;
-  int32_T q0;
   uint32_T qY;
   int32_T u0;
   int32_T u1;
+  static const int16_T b[6] = { 90, 330, 30, 210, 150, 270 };
 
+  static const int16_T c[6] = { 240, 300, 0, 60, 120, 180 };
   /* Update the flag to indicate when data transfers from
    *  Sample time: [0.0001s, 0.0s] to Sample time: [0.001s, 0.0s]  */
   (PMSMctrl_M->Timing.RateInteraction.TID0_1)++;
@@ -276,13 +277,13 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Product: '<S10>/Product1' */
   PMSMctrl_B.Product1 = (real32_T)PMSMctrl_B.Switch2_f * position_ref;
 
-  /* UnitDelay: '<S34>/Unit  Delay' */
+  /* UnitDelay: '<S33>/Unit  Delay' */
   PMSMctrl_B.y1 = PMSMctrl_DWork.UnitDelay_DSTATE;
 
-  /* Sum: '<S34>/Sum1' */
+  /* Sum: '<S33>/Sum1' */
   PMSMctrl_B.Sum1 = PMSMctrl_B.Product1 - PMSMctrl_B.y1;
 
-  /* Saturate: '<S34>/Saturation' */
+  /* Saturate: '<S33>/Saturation' */
   if (PMSMctrl_B.Sum1 > 2.25F) {
     PMSMctrl_B.Deltau_limit = 2.25F;
   } else if (PMSMctrl_B.Sum1 < (-2.25F)) {
@@ -291,9 +292,8 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.Deltau_limit = PMSMctrl_B.Sum1;
   }
 
-  /* End of Saturate: '<S34>/Saturation' */
-
-  /* Sum: '<S34>/Sum' */
+  /* End of Saturate: '<S33>/Saturation' */
+  /* Sum: '<S33>/Sum' */
   PMSMctrl_B.y = PMSMctrl_B.Deltau_limit + PMSMctrl_B.y1;
 
   /* MATLAB Function: '<S8>/MATLAB Function2' incorporates:
@@ -315,17 +315,17 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
       qY = 0U;
     }
 
-    if (qY > 5000U) {
+    if (qY > 2000U) {
       /* '<S28>:1:25' */
       /* '<S28>:1:26' */
-      q0 = PMSMctrl_DWork.turn_cnt;
-      if (q0 > 2147483646) {
-        q0 = MAX_int32_T;
+      ref = PMSMctrl_DWork.turn_cnt;
+      if (ref > 2147483646) {
+        ref = MAX_int32_T;
       } else {
-        q0++;
+        ref++;
       }
 
-      PMSMctrl_DWork.turn_cnt = q0;
+      PMSMctrl_DWork.turn_cnt = ref;
     } else {
       cnt_temp = PMSMctrl_U.SPORT_cnt;
       qY = cnt_temp - PMSMctrl_DWork.cnt_old;
@@ -333,17 +333,17 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
         qY = 0U;
       }
 
-      if (qY > 5000U) {
+      if (qY > 2000U) {
         /* '<S28>:1:27' */
         /* '<S28>:1:28' */
-        q0 = PMSMctrl_DWork.turn_cnt;
-        if (q0 < -2147483647) {
-          q0 = MIN_int32_T;
+        ref = PMSMctrl_DWork.turn_cnt;
+        if (ref < -2147483647) {
+          ref = MIN_int32_T;
         } else {
-          q0--;
+          ref--;
         }
 
-        PMSMctrl_DWork.turn_cnt = q0;
+        PMSMctrl_DWork.turn_cnt = ref;
       }
     }
 
@@ -372,163 +372,163 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_B.DataTypeConversion5 = (real32_T)PMSMctrl_B.DataTypeConversion6;
 
   /* Gain: '<S8>/Gain6' */
-  PMSMctrl_B.Gain6 = 0.000628318521F * PMSMctrl_B.DataTypeConversion5;
+  PMSMctrl_B.Gain6 = 0.00157079636F * PMSMctrl_B.DataTypeConversion5;
 
   /* MATLAB Function: '<S7>/MATLAB Function4' incorporates:
    *  Inport: '<Root>/hall_state'
    */
   /* MATLAB Function 'PMSMctrl/EncInterface/MATLAB Function4': '<S25>:1' */
-  /* '<S25>:1:59' */
-  /* '<S25>:1:41' */
+  /* '<S25>:1:44' */
+  /* '<S25>:1:65' */
   if (!PMSMctrl_DWork.AngleStartTable_not_empty) {
     /* '<S25>:1:30' */
-    /* '<S25>:1:41' */
+    /* '<S25>:1:44' */
     multi_out = 6.28318548F / (4.0F * 360.0F);
-    for (q0 = 0; q0 < 6; q0++) {
-      PMSMctrl_DWork.AngleStartTable[q0] = multi_out * (real32_T)b[q0];
+    for (ref = 0; ref < 6; ref++) {
+      PMSMctrl_DWork.AngleStartTable[ref] = multi_out * (real32_T)b[ref];
     }
 
     PMSMctrl_DWork.AngleStartTable_not_empty = true;
   }
 
   if (!PMSMctrl_DWork.AngleTable_not_empty) {
-    /* '<S25>:1:48' */
-    /* '<S25>:1:59' */
+    /* '<S25>:1:51' */
+    /* '<S25>:1:65' */
     multi_out = 6.28318548F / (4.0F * 360.0F);
-    for (q0 = 0; q0 < 6; q0++) {
-      PMSMctrl_DWork.AngleTable[q0] = multi_out * (real32_T)c[q0];
+    for (ref = 0; ref < 6; ref++) {
+      PMSMctrl_DWork.AngleTable[ref] = multi_out * (real32_T)c[ref];
     }
 
     PMSMctrl_DWork.AngleTable_not_empty = true;
   }
 
   if (PMSMctrl_DWork.OffsetState == 0) {
-    /* '<S25>:1:66' */
-    /* '<S25>:1:67' */
+    /* '<S25>:1:72' */
+    /* '<S25>:1:73' */
     PMSMctrl_DWork.HallIn = PMSMctrl_U.hall_state;
     if (PMSMctrl_DWork.HallIn == 1) {
-      /* '<S25>:1:69' */
-      /* '<S25>:1:70' */
-      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[0];
-    } else if (PMSMctrl_DWork.HallIn == 2) {
-      /* '<S25>:1:71' */
-      /* '<S25>:1:72' */
-      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[1];
-    } else if (PMSMctrl_DWork.HallIn == 3) {
-      /* '<S25>:1:73' */
-      /* '<S25>:1:74' */
-      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[2];
-    } else if (PMSMctrl_DWork.HallIn == 4) {
       /* '<S25>:1:75' */
       /* '<S25>:1:76' */
-      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[3];
-    } else if (PMSMctrl_DWork.HallIn == 5) {
+      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[0];
+    } else if (PMSMctrl_DWork.HallIn == 2) {
       /* '<S25>:1:77' */
       /* '<S25>:1:78' */
-      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[4];
-    } else if (PMSMctrl_DWork.HallIn == 6) {
+      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[1];
+    } else if (PMSMctrl_DWork.HallIn == 3) {
       /* '<S25>:1:79' */
       /* '<S25>:1:80' */
+      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[2];
+    } else if (PMSMctrl_DWork.HallIn == 4) {
+      /* '<S25>:1:81' */
+      /* '<S25>:1:82' */
+      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[3];
+    } else if (PMSMctrl_DWork.HallIn == 5) {
+      /* '<S25>:1:83' */
+      /* '<S25>:1:84' */
+      PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[4];
+    } else if (PMSMctrl_DWork.HallIn == 6) {
+      /* '<S25>:1:85' */
+      /* '<S25>:1:86' */
       PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[5];
     } else {
-      /* '<S25>:1:82' */
+      /* '<S25>:1:88' */
       PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleStartTable[5];
     }
 
-    /* '<S25>:1:86' */
+    /* '<S25>:1:92' */
     PMSMctrl_DWork.AbsAngle -= PMSMctrl_B.Gain6;
 
-    /* '<S25>:1:89' */
+    /* '<S25>:1:95' */
     PMSMctrl_DWork.OffsetState = 1U;
   } else if (PMSMctrl_DWork.OffsetState == 1) {
-    /* '<S25>:1:91' */
+    /* '<S25>:1:97' */
     if (PMSMctrl_U.hall_state != PMSMctrl_DWork.HallIn) {
-      /* '<S25>:1:92' */
-      /* '<S25>:1:93' */
+      /* '<S25>:1:98' */
+      /* '<S25>:1:99' */
       switch (PMSMctrl_U.hall_state) {
        case 6:
         if (PMSMctrl_DWork.HallIn == 2) {
-          /* '<S25>:1:95' */
-          /* '<S25>:1:96' */
+          /* '<S25>:1:101' */
+          /* '<S25>:1:102' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[1];
         } else {
-          /* '<S25>:1:98' */
+          /* '<S25>:1:104' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[0];
         }
         break;
 
        case 2:
         if (PMSMctrl_DWork.HallIn == 3) {
-          /* '<S25>:1:101' */
-          /* '<S25>:1:102' */
+          /* '<S25>:1:107' */
+          /* '<S25>:1:108' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[2];
         } else {
-          /* '<S25>:1:104' */
+          /* '<S25>:1:110' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[1];
         }
         break;
 
        case 3:
         if (PMSMctrl_DWork.HallIn == 1) {
-          /* '<S25>:1:107' */
-          /* '<S25>:1:108' */
+          /* '<S25>:1:113' */
+          /* '<S25>:1:114' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[3];
         } else {
-          /* '<S25>:1:110' */
+          /* '<S25>:1:116' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[2];
         }
         break;
 
        case 1:
         if (PMSMctrl_DWork.HallIn == 5) {
-          /* '<S25>:1:113' */
-          /* '<S25>:1:114' */
+          /* '<S25>:1:119' */
+          /* '<S25>:1:120' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[4];
         } else {
-          /* '<S25>:1:116' */
+          /* '<S25>:1:122' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[3];
         }
         break;
 
        case 5:
         if (PMSMctrl_DWork.HallIn == 4) {
-          /* '<S25>:1:119' */
-          /* '<S25>:1:120' */
+          /* '<S25>:1:125' */
+          /* '<S25>:1:126' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[5];
         } else {
-          /* '<S25>:1:122' */
+          /* '<S25>:1:128' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[4];
         }
         break;
 
        default:
         if (PMSMctrl_DWork.HallIn == 6) {
-          /* '<S25>:1:125' */
-          /* '<S25>:1:126' */
+          /* '<S25>:1:131' */
+          /* '<S25>:1:132' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[0];
         } else {
-          /* '<S25>:1:128' */
+          /* '<S25>:1:134' */
           PMSMctrl_DWork.AbsAngle = PMSMctrl_DWork.AngleTable[5];
         }
         break;
       }
 
-      /* '<S25>:1:131' */
+      /* '<S25>:1:137' */
       PMSMctrl_DWork.OffsetState = 2U;
 
-      /* '<S25>:1:135' */
+      /* '<S25>:1:141' */
       PMSMctrl_DWork.AbsAngle -= PMSMctrl_B.Gain6;
     }
 
-    /* '<S25>:1:140' */
+    /* '<S25>:1:146' */
     PMSMctrl_DWork.HallIn = PMSMctrl_U.hall_state;
   } else {
-    /* '<S25>:1:142' */
+    /* '<S25>:1:148' */
     PMSMctrl_DWork.HallIn = PMSMctrl_U.hall_state;
   }
 
-  /* '<S25>:1:144' */
-  PMSMctrl_B.y_d = PMSMctrl_DWork.AbsAngle;
+  /* '<S25>:1:150' */
+  PMSMctrl_B.y_k = PMSMctrl_DWork.AbsAngle;
 
   /* End of MATLAB Function: '<S7>/MATLAB Function4' */
 
@@ -543,7 +543,7 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     pos_unaligned = PMSMctrl_B.Sum4_dt;
   } else {
     /* Sum: '<S7>/Sum3' */
-    PMSMctrl_B.Sum3_n = PMSMctrl_B.Gain6 + PMSMctrl_B.y_d;
+    PMSMctrl_B.Sum3_n = PMSMctrl_B.Gain6 + PMSMctrl_B.y_k;
     pos_unaligned = PMSMctrl_B.Sum3_n;
   }
 
@@ -617,13 +617,13 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Sum: '<S10>/Sum1' */
   PMSMctrl_B.Sum1_n = PMSMctrl_B.PosLoopGain + PMSMctrl_B.Switch4;
 
-  /* UnitDelay: '<S33>/Unit  Delay' */
+  /* UnitDelay: '<S32>/Unit  Delay' */
   PMSMctrl_B.y1_d = PMSMctrl_DWork.UnitDelay_DSTATE_i;
 
-  /* Sum: '<S33>/Sum1' */
+  /* Sum: '<S32>/Sum1' */
   PMSMctrl_B.Sum1_m = PMSMctrl_B.Sum1_n - PMSMctrl_B.y1_d;
 
-  /* Saturate: '<S33>/Saturation' */
+  /* Saturate: '<S32>/Saturation' */
   if (PMSMctrl_B.Sum1_m > 2.25F) {
     PMSMctrl_B.Deltau_limit_g = 2.25F;
   } else if (PMSMctrl_B.Sum1_m < (-2.25F)) {
@@ -632,17 +632,17 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.Deltau_limit_g = PMSMctrl_B.Sum1_m;
   }
 
-  /* End of Saturate: '<S33>/Saturation' */
+  /* End of Saturate: '<S32>/Saturation' */
 
-  /* Sum: '<S33>/Sum' */
+  /* Sum: '<S32>/Sum' */
   PMSMctrl_B.y_i = PMSMctrl_B.Deltau_limit_g + PMSMctrl_B.y1_d;
 
   /* Saturate: '<S10>/MAX_RPM' */
-  q0 = PMSMctrl_P.MAX_RPM;
-  if (PMSMctrl_B.y_i > q0) {
-    Nref = (real32_T)q0;
-  } else if (PMSMctrl_B.y_i < (-2000.0F)) {
-    Nref = (-2000.0F);
+  ref = PMSMctrl_P.MAX_RPM;
+  if (PMSMctrl_B.y_i > ref) {
+    Nref = (real32_T)ref;
+  } else if (PMSMctrl_B.y_i < (-3000.0F)) {
+    Nref = (-3000.0F);
   } else {
     Nref = PMSMctrl_B.y_i;
   }
@@ -684,48 +684,48 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
 
   /* End of Switch: '<S17>/Switch' */
 
-  /* Saturate: '<S140>/MAX_RPM' */
-  q0 = PMSMctrl_P.MAX_RPM;
-  if (PMSMctrl_B.Switch > q0) {
-    PMSMctrl_B.MAX_RPM = (real32_T)q0;
+  /* Saturate: '<S88>/MAX_RPM' */
+  ref = PMSMctrl_P.MAX_RPM;
+  if (PMSMctrl_B.Switch > ref) {
+    PMSMctrl_B.MAX_RPM = (real32_T)ref;
   } else if (PMSMctrl_B.Switch < 0.0F) {
     PMSMctrl_B.MAX_RPM = 0.0F;
   } else {
     PMSMctrl_B.MAX_RPM = PMSMctrl_B.Switch;
   }
 
-  /* End of Saturate: '<S140>/MAX_RPM' */
+  /* End of Saturate: '<S88>/MAX_RPM' */
 
-  /* Gain: '<S140>/Gain1' */
+  /* Gain: '<S88>/Gain1' */
   multi_out = (real32_T)fmod((real32_T)floor(256.0F * PMSMctrl_B.MAX_RPM),
     4.294967296E+9);
   PMSMctrl_B.Gain1_j = multi_out < 0.0F ? -(int32_T)(uint32_T)-multi_out :
     (int32_T)(uint32_T)multi_out;
 
-  /* UnitDelay: '<S140>/Unit Delay1' */
+  /* UnitDelay: '<S88>/Unit Delay1' */
   PMSMctrl_B.UnitDelay1 = PMSMctrl_DWork.UnitDelay1_DSTATE;
 
-  /* Sum: '<S140>/Sum2' */
+  /* Sum: '<S88>/Sum2' */
   PMSMctrl_B.Sum2_p = PMSMctrl_B.Gain1_j - PMSMctrl_B.UnitDelay1;
 
-  /* Saturate: '<S140>/VF_MAX_RATE' */
+  /* Saturate: '<S88>/VF_MAX_RATE' */
   u0 = PMSMctrl_B.Sum2_p;
   u1 = (-10);
-  q0 = PMSMctrl_P.VF_MAX_RATE;
-  if (u0 > q0) {
-    PMSMctrl_B.VF_MAX_RATE = q0;
+  ref = PMSMctrl_P.VF_MAX_RATE;
+  if (u0 > ref) {
+    PMSMctrl_B.VF_MAX_RATE = ref;
   } else if (u0 < u1) {
     PMSMctrl_B.VF_MAX_RATE = u1;
   } else {
     PMSMctrl_B.VF_MAX_RATE = u0;
   }
 
-  /* End of Saturate: '<S140>/VF_MAX_RATE' */
+  /* End of Saturate: '<S88>/VF_MAX_RATE' */
 
-  /* Sum: '<S140>/Sum4' */
+  /* Sum: '<S88>/Sum4' */
   PMSMctrl_B.Sum4_o = PMSMctrl_B.VF_MAX_RATE + PMSMctrl_B.UnitDelay1;
 
-  /* Gain: '<S140>/Gain2' */
+  /* Gain: '<S88>/Gain2' */
   PMSMctrl_B.Gain2_d = (int16_T)mul_s32_hiSR(1073741824, PMSMctrl_B.Sum4_o, 6U);
 
   /* RelationalOperator: '<S5>/Compare' incorporates:
@@ -760,12 +760,63 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
 
   /* End of Switch: '<S14>/Switch3' */
 
+  /* Switch: '<S14>/Switch5' incorporates:
+   *  Constant: '<S14>/SpdMul7'
+   *  Constant: '<S1>/SYS_CMD'
+   */
+  if (PMSMctrl_P.SYSTEM_CMD > ((uint8_T)0U)) {
+    PMSMctrl_B.Switch5 = speed_ref;
+  } else {
+    PMSMctrl_B.Switch5 = 0.0F;
+  }
+
+  /* End of Switch: '<S14>/Switch5' */
+
+  /* MATLAB Function: '<S14>/MATLAB Function2' */
+  /* MATLAB Function 'PMSMctrl/SpeedControl/MATLAB Function2': '<S41>:1' */
+  if (PMSMctrl_DWork.sample_count <= 2000) {
+    /* '<S41>:1:9' */
+    /* '<S41>:1:10' */
+    multi_out = PMSMctrl_B.Switch5;
+  } else {
+    /* '<S41>:1:12' */
+    multi_out = 0.0F;
+  }
+
+  if (PMSMctrl_DWork.sample_count == 4000) {
+    /* '<S41>:1:15' */
+    /* '<S41>:1:16' */
+    PMSMctrl_DWork.sample_count = 0U;
+  }
+
+  /* '<S41>:1:19' */
+  cnt_temp = PMSMctrl_DWork.sample_count + 1U;
+  if (cnt_temp > 65535U) {
+    cnt_temp = 65535U;
+  }
+
+  PMSMctrl_DWork.sample_count = (uint16_T)cnt_temp;
+
+  /* '<S41>:1:21' */
+  w_step = multi_out;
+
+  /* End of MATLAB Function: '<S14>/MATLAB Function2' */
+
+  /* ManualSwitch: '<S14>/Manual Switch1' */
+  if (((uint8_T)1U) == 1) {
+    w_ref = speed_ref;
+  } else {
+    w_ref = w_step;
+  }
+
+  /* End of ManualSwitch: '<S14>/Manual Switch1' */
+
   /* Switch: '<S14>/Switch' incorporates:
    *  Constant: '<S14>/SpdMul3'
    *  Constant: '<S1>/SYS_CMD'
    */
   if (PMSMctrl_P.SYSTEM_CMD > ((uint8_T)0U)) {
-    PMSMctrl_B.Switch_n = speed_ref;
+    PMSMctrl_B.Switch_n = w_ref;
   } else {
     PMSMctrl_B.Switch_n = 0;
   }
@@ -773,11 +824,11 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* End of Switch: '<S14>/Switch' */
 
   /* Saturate: '<S14>/MAX_RPM' */
-  q0 = PMSMctrl_P.MAX_RPM;
-  if (PMSMctrl_B.Switch_n > q0) {
-    PMSMctrl_B.MAX_RPM_j = (real32_T)q0;
-  } else if (PMSMctrl_B.Switch_n < (-2000.0F)) {
-    PMSMctrl_B.MAX_RPM_j = (-2000.0F);
+  ref = PMSMctrl_P.MAX_RPM;
+  if (PMSMctrl_B.Switch_n > ref) {
+    PMSMctrl_B.MAX_RPM_j = (real32_T)ref;
+  } else if (PMSMctrl_B.Switch_n < (-3000.0F)) {
+    PMSMctrl_B.MAX_RPM_j = (-3000.0F);
   } else {
     PMSMctrl_B.MAX_RPM_j = PMSMctrl_B.Switch_n;
   }
@@ -790,13 +841,13 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* DataTypeConversion: '<S14>/Data Type Conversion' */
   PMSMctrl_B.DataTypeConversion = PMSMctrl_B.Product1_b;
 
-  /* UnitDelay: '<S39>/Unit  Delay' */
+  /* UnitDelay: '<S38>/Unit  Delay' */
   PMSMctrl_B.y1_h = PMSMctrl_DWork.UnitDelay_DSTATE_e;
 
-  /* Sum: '<S39>/Sum1' */
+  /* Sum: '<S38>/Sum1' */
   PMSMctrl_B.Sum1_j = PMSMctrl_B.DataTypeConversion - PMSMctrl_B.y1_h;
 
-  /* Saturate: '<S39>/Saturation' */
+  /* Saturate: '<S38>/Saturation' */
   if (PMSMctrl_B.Sum1_j > PMSMctrl_P.SpdSlewRatePos) {
     PMSMctrl_B.Deltau_limit_h = PMSMctrl_P.SpdSlewRatePos;
   } else if (PMSMctrl_B.Sum1_j < PMSMctrl_P.SpdSlewRateNeg) {
@@ -805,9 +856,9 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.Deltau_limit_h = PMSMctrl_B.Sum1_j;
   }
 
-  /* End of Saturate: '<S39>/Saturation' */
+  /* End of Saturate: '<S38>/Saturation' */
 
-  /* Sum: '<S39>/Sum' */
+  /* Sum: '<S38>/Sum' */
   speed_ref_lim = PMSMctrl_B.Deltau_limit_h + PMSMctrl_B.y1_h;
 
   /* RateTransition: '<S1>/Rate Transition1' */
@@ -906,28 +957,28 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_B.Sum2 = speed_ref_lim - speed_fil;
 
   /* MATLAB Function: '<S14>/MATLAB Function' */
-  /* MATLAB Function 'PMSMctrl/SpeedControl/MATLAB Function': '<S40>:1' */
-  /* '<S40>:1:24' */
+  /* MATLAB Function 'PMSMctrl/SpeedControl/MATLAB Function': '<S39>:1' */
+  /* '<S39>:1:24' */
   multi_out = (real32_T)fabs(speed_ref_lim);
-  if (multi_out < 2000.0F) {
-    /* '<S40>:1:26' */
-    /* '<S40>:1:27' */
+  if (multi_out < 3000.0F) {
+    /* '<S39>:1:26' */
+    /* '<S39>:1:27' */
     multi_out = PMSMctrl_GainMax;
   } else {
-    /* '<S40>:1:29' */
-    multi_out = (PMSMctrl_GainMax - 0.1F) * 2000.0F / multi_out + 0.1F;
+    /* '<S39>:1:29' */
+    multi_out = (PMSMctrl_GainMax - 0.1F) * 3000.0F / multi_out + 0.1F;
   }
 
-  /* '<S40>:1:32' */
-  /* '<S40>:1:34' */
-  PMSMctrl_B.y_e = multi_out * PMSMctrl_B.Sum2;
+  /* '<S39>:1:32' */
+  /* '<S39>:1:34' */
+  PMSMctrl_B.y_o = multi_out * PMSMctrl_B.Sum2;
 
   /* End of MATLAB Function: '<S14>/MATLAB Function' */
 
-  /* Gain: '<S113>/Proportional Gain' */
-  PMSMctrl_B.ProportionalGain = PMSMctrl_P.Kpw * PMSMctrl_B.y_e;
+  /* Gain: '<S76>/Proportional Gain' */
+  PMSMctrl_B.ProportionalGain = PMSMctrl_P.Kpw * PMSMctrl_B.y_o;
 
-  /* DiscreteIntegrator: '<S96>/Integrator' incorporates:
+  /* DiscreteIntegrator: '<S71>/Integrator' incorporates:
    *  Constant: '<S1>/SYS_CMD'
    */
   if ((PMSMctrl_P.SYSTEM_CMD > 0) && (PMSMctrl_DWork.Integrator_PrevResetState <=
@@ -937,12 +988,12 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
 
   PMSMctrl_B.Integrator = PMSMctrl_DWork.Integrator_DSTATE;
 
-  /* End of DiscreteIntegrator: '<S96>/Integrator' */
+  /* End of DiscreteIntegrator: '<S71>/Integrator' */
 
-  /* Gain: '<S73>/Derivative Gain' */
-  PMSMctrl_B.DerivativeGain = 0.0F * PMSMctrl_B.y_e;
+  /* Gain: '<S65>/Derivative Gain' */
+  PMSMctrl_B.DerivativeGain = 0.0F * PMSMctrl_B.y_o;
 
-  /* DiscreteIntegrator: '<S78>/Filter' incorporates:
+  /* DiscreteIntegrator: '<S66>/Filter' incorporates:
    *  Constant: '<S1>/SYS_CMD'
    */
   if ((PMSMctrl_P.SYSTEM_CMD > 0) && (PMSMctrl_DWork.Filter_PrevResetState <= 0))
@@ -952,51 +1003,54 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
 
   PMSMctrl_B.Filter = PMSMctrl_DWork.Filter_DSTATE;
 
-  /* End of DiscreteIntegrator: '<S78>/Filter' */
+  /* End of DiscreteIntegrator: '<S66>/Filter' */
 
-  /* Sum: '<S78>/SumD' */
+  /* Sum: '<S66>/SumD' */
   PMSMctrl_B.SumD = PMSMctrl_B.DerivativeGain - PMSMctrl_B.Filter;
 
-  /* Gain: '<S106>/Filter Coefficient' */
+  /* Gain: '<S74>/Filter Coefficient' */
   PMSMctrl_B.FilterCoefficient = 2.0F * PMSMctrl_B.SumD;
 
-  /* Sum: '<S126>/Sum' */
+  /* Sum: '<S80>/Sum' */
   PMSMctrl_B.Sum_i = (PMSMctrl_B.ProportionalGain + PMSMctrl_B.Integrator) +
     PMSMctrl_B.FilterCoefficient;
 
   /* MATLAB Function: '<S14>/MATLAB Function1' */
-  /* MATLAB Function 'PMSMctrl/SpeedControl/MATLAB Function1': '<S41>:1' */
-  if (PMSMctrl_DWork.sample_count <= 100) {
-    /* '<S41>:1:9' */
-    /* '<S41>:1:10' */
-    multi_out = 0.0F;
+  /* MATLAB Function 'PMSMctrl/SpeedControl/MATLAB Function1': '<S40>:1' */
+  if (PMSMctrl_DWork.sample_count_f <= 100) {
+    /* '<S40>:1:9' */
+    /* '<S40>:1:10' */
+    ref = -1;
   } else {
-    /* '<S41>:1:12' */
-    multi_out = 0.5F;
+    /* '<S40>:1:12' */
+    ref = 1;
   }
 
-  if (PMSMctrl_DWork.sample_count == 200) {
-    /* '<S41>:1:15' */
-    /* '<S41>:1:16' */
-    PMSMctrl_DWork.sample_count = 0U;
+  if (PMSMctrl_DWork.sample_count_f == 200) {
+    /* '<S40>:1:15' */
+    /* '<S40>:1:16' */
+    PMSMctrl_DWork.sample_count_f = 0U;
   }
 
-  /* '<S41>:1:19' */
-  cnt_temp = PMSMctrl_DWork.sample_count + 1U;
+  /* '<S40>:1:19' */
+  cnt_temp = PMSMctrl_DWork.sample_count_f + 1U;
   if (cnt_temp > 65535U) {
     cnt_temp = 65535U;
   }
 
-  PMSMctrl_DWork.sample_count = (uint16_T)cnt_temp;
+  PMSMctrl_DWork.sample_count_f = (uint16_T)cnt_temp;
 
-  /* '<S41>:1:21' */
-  iq_ref_step = multi_out;
+  /* '<S40>:1:21' */
+  iq_ref_step = (real32_T)ref;
 
   /* End of MATLAB Function: '<S14>/MATLAB Function1' */
 
-  /* ManualSwitch: '<S14>/Manual Switch' */
+  /* ManualSwitch: '<S14>/Manual Switch' incorporates:
+   *  Constant: '<S1>/SYS_CMD'
+   *  Switch: '<S14>/Switch1'
+   */
   if (((uint8_T)1U) == 1) {
-    /* Saturate: '<S117>/Saturation' */
+    /* Saturate: '<S78>/Saturation' */
     if (PMSMctrl_B.Sum_i > PMSMctrl_P.iqMax) {
       PMSMctrl_B.Saturation_b = PMSMctrl_P.iqMax;
     } else if (PMSMctrl_B.Sum_i < PMSMctrl_P.iqMin) {
@@ -1005,15 +1059,25 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
       PMSMctrl_B.Saturation_b = PMSMctrl_B.Sum_i;
     }
 
-    /* End of Saturate: '<S117>/Saturation' */
+    /* End of Saturate: '<S78>/Saturation' */
     iq_ref = PMSMctrl_B.Saturation_b;
   } else {
-    iq_ref = iq_ref_step;
+    if (PMSMctrl_P.SYSTEM_CMD > ((uint8_T)0U)) {
+      /* Switch: '<S14>/Switch1' */
+      PMSMctrl_B.Switch1_a = iq_ref_step;
+    } else {
+      /* Switch: '<S14>/Switch1' incorporates:
+       *  Constant: '<S14>/SpdMul4'
+       */
+      PMSMctrl_B.Switch1_a = 0.0F;
+    }
+
+    iq_ref = PMSMctrl_B.Switch1_a;
   }
 
   /* End of ManualSwitch: '<S14>/Manual Switch' */
 
-  /* SignalConversion: '<S18>/TmpSignal ConversionAtS-FunctionInport1' incorporates:
+  /* SignalConversion generated from: '<S18>/S-Function' incorporates:
    *  Constant: '<S1>/Constant'
    */
   PMSMctrl_B.TmpSignalConversionAtSFunctionI[0] = 0.0F;
@@ -1047,12 +1111,12 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_DWork.ib_acc += PMSMctrl_B.DataTypeConversion7[1];
 
     /* '<S27>:1:47' */
-    q0 = PMSMctrl_DWork.sample + 1;
-    if (q0 > 32767) {
-      q0 = 32767;
+    ref = PMSMctrl_DWork.sample + 1;
+    if (ref > 32767) {
+      ref = 32767;
     }
 
-    PMSMctrl_DWork.sample = (int16_T)q0;
+    PMSMctrl_DWork.sample = (int16_T)ref;
   }
 
   if (PMSMctrl_DWork.sample == 50.0) {
@@ -1077,12 +1141,12 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_DWork.SysCmd_old = PMSMctrl_P.SYSTEM_CMD;
 
   /* '<S27>:1:60' */
-  PMSMctrl_B.y_k[0] = PMSMctrl_DWork.CurOff[0];
+  PMSMctrl_B.y_j[0] = PMSMctrl_DWork.CurOff[0];
 
   /* Sum: '<S8>/Sum4' */
   multi_out = (real32_T)fmod((real32_T)floor(PMSMctrl_B.DataTypeConversion7[0]),
     65536.0);
-  cosOut = (real32_T)fmod((real32_T)floor(PMSMctrl_B.y_k[0]), 65536.0);
+  cosOut = (real32_T)fmod((real32_T)floor(PMSMctrl_B.y_j[0]), 65536.0);
   PMSMctrl_B.Sum4[0] = (int16_T)((multi_out < 0.0F ? (int32_T)(int16_T)-(int16_T)
     (uint16_T)-multi_out : (int32_T)(int16_T)(uint16_T)multi_out) - (cosOut <
     0.0F ? (int32_T)(int16_T)-(int16_T)(uint16_T)-cosOut : (int32_T)(int16_T)
@@ -1098,12 +1162,12 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_B.Gain7[0] = (-1.0F) * PMSMctrl_B.Gain5[0];
 
   /* MATLAB Function: '<S8>/MATLAB Function1' */
-  PMSMctrl_B.y_k[1] = PMSMctrl_DWork.CurOff[1];
+  PMSMctrl_B.y_j[1] = PMSMctrl_DWork.CurOff[1];
 
   /* Sum: '<S8>/Sum4' */
   multi_out = (real32_T)fmod((real32_T)floor(PMSMctrl_B.DataTypeConversion7[1]),
     65536.0);
-  cosOut = (real32_T)fmod((real32_T)floor(PMSMctrl_B.y_k[1]), 65536.0);
+  cosOut = (real32_T)fmod((real32_T)floor(PMSMctrl_B.y_j[1]), 65536.0);
   PMSMctrl_B.Sum4[1] = (int16_T)((multi_out < 0.0F ? (int32_T)(int16_T)-(int16_T)
     (uint16_T)-multi_out : (int32_T)(int16_T)(uint16_T)multi_out) - (cosOut <
     0.0F ? (int32_T)(int16_T)-(int16_T)(uint16_T)-cosOut : (int32_T)(int16_T)
@@ -1126,13 +1190,13 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
    *  Inport: '<Root>/iabc_adc'
    */
   /* MATLAB Function 'PMSMctrl/InputScaling/MATLAB Function': '<S26>:1' */
-  if ((PMSMctrl_P.SYSTEM_CMD == 0) && (PMSMctrl_DWork.SysCmd_old_o == 1)) {
+  if ((PMSMctrl_P.SYSTEM_CMD == 0) && (PMSMctrl_DWork.SysCmd_old_m == 1)) {
     /* '<S26>:1:41' */
     /* '<S26>:1:42' */
-    PMSMctrl_DWork.ia_acc_i = 0.0F;
+    PMSMctrl_DWork.ia_acc_m = 0.0F;
 
     /* '<S26>:1:43' */
-    PMSMctrl_DWork.ib_acc_m = 0.0F;
+    PMSMctrl_DWork.ib_acc_j = 0.0F;
 
     /* '<S26>:1:44' */
     PMSMctrl_DWork.ic_acc = 0.0F;
@@ -1141,27 +1205,27 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   if (PMSMctrl_P.SYSTEM_CMD == 0) {
     /* '<S26>:1:47' */
     /* '<S26>:1:48' */
-    PMSMctrl_DWork.ia_acc_i += (real32_T)PMSMctrl_U.iabc_adc[0];
+    PMSMctrl_DWork.ia_acc_m += (real32_T)PMSMctrl_U.iabc_adc[0];
 
     /* '<S26>:1:49' */
-    PMSMctrl_DWork.ib_acc_m += (real32_T)PMSMctrl_U.iabc_adc[1];
+    PMSMctrl_DWork.ib_acc_j += (real32_T)PMSMctrl_U.iabc_adc[1];
 
     /* '<S26>:1:50' */
     PMSMctrl_DWork.ic_acc += (real32_T)PMSMctrl_U.iabc_adc[2];
 
     /* '<S26>:1:51' */
-    q0 = PMSMctrl_DWork.sample_b + 1;
-    if (q0 > 32767) {
-      q0 = 32767;
+    ref = PMSMctrl_DWork.sample_o + 1;
+    if (ref > 32767) {
+      ref = 32767;
     }
 
-    PMSMctrl_DWork.sample_b = (int16_T)q0;
+    PMSMctrl_DWork.sample_o = (int16_T)ref;
   }
 
-  if (PMSMctrl_DWork.sample_b == 50.0) {
+  if (PMSMctrl_DWork.sample_o == 50.0) {
     /* '<S26>:1:54' */
     /* '<S26>:1:55' */
-    multi_out = rt_roundf(PMSMctrl_DWork.ia_acc_i / (real32_T)50.0);
+    multi_out = rt_roundf(PMSMctrl_DWork.ia_acc_m / (real32_T)50.0);
     if (multi_out < 32768.0F) {
       if (multi_out >= -32768.0F) {
         tmp = (int16_T)multi_out;
@@ -1172,15 +1236,15 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
       tmp = MAX_int16_T;
     }
 
-    q0 = tmp - 32767;
-    if (q0 < -32768) {
-      q0 = -32768;
+    ref = tmp - 32767;
+    if (ref < -32768) {
+      ref = -32768;
     }
 
-    PMSMctrl_DWork.CurOff_m[0] = (int16_T)q0;
+    PMSMctrl_DWork.CurOff_p[0] = (int16_T)ref;
 
     /* '<S26>:1:56' */
-    multi_out = rt_roundf(PMSMctrl_DWork.ib_acc_m / (real32_T)50.0);
+    multi_out = rt_roundf(PMSMctrl_DWork.ib_acc_j / (real32_T)50.0);
     if (multi_out < 32768.0F) {
       if (multi_out >= -32768.0F) {
         tmp = (int16_T)multi_out;
@@ -1191,12 +1255,12 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
       tmp = MAX_int16_T;
     }
 
-    q0 = tmp - 32767;
-    if (q0 < -32768) {
-      q0 = -32768;
+    ref = tmp - 32767;
+    if (ref < -32768) {
+      ref = -32768;
     }
 
-    PMSMctrl_DWork.CurOff_m[1] = (int16_T)q0;
+    PMSMctrl_DWork.CurOff_p[1] = (int16_T)ref;
 
     /* '<S26>:1:57' */
     multi_out = rt_roundf(PMSMctrl_DWork.ic_acc / (real32_T)50.0);
@@ -1210,37 +1274,37 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
       tmp = MAX_int16_T;
     }
 
-    q0 = tmp - 32767;
-    if (q0 < -32768) {
-      q0 = -32768;
+    ref = tmp - 32767;
+    if (ref < -32768) {
+      ref = -32768;
     }
 
-    PMSMctrl_DWork.CurOff_m[2] = (int16_T)q0;
+    PMSMctrl_DWork.CurOff_p[2] = (int16_T)ref;
 
     /* '<S26>:1:58' */
-    PMSMctrl_DWork.ia_acc_i = 0.0F;
+    PMSMctrl_DWork.ia_acc_m = 0.0F;
 
     /* '<S26>:1:59' */
-    PMSMctrl_DWork.ib_acc_m = 0.0F;
+    PMSMctrl_DWork.ib_acc_j = 0.0F;
 
     /* '<S26>:1:60' */
     PMSMctrl_DWork.ic_acc = 0.0F;
 
     /* '<S26>:1:61' */
-    PMSMctrl_DWork.sample_b = 0;
+    PMSMctrl_DWork.sample_o = 0;
   }
 
   /* '<S26>:1:64' */
-  PMSMctrl_DWork.SysCmd_old_o = PMSMctrl_P.SYSTEM_CMD;
+  PMSMctrl_DWork.SysCmd_old_m = PMSMctrl_P.SYSTEM_CMD;
 
   /* '<S26>:1:66' */
-  PMSMctrl_B.y_gd[0] = PMSMctrl_DWork.CurOff_m[0];
+  PMSMctrl_B.y_a[0] = PMSMctrl_DWork.CurOff_p[0];
 
   /* Sum: '<S8>/Sum5' incorporates:
    *  Inport: '<Root>/iabc_adc'
    */
-  PMSMctrl_B.Sum5_p[0] = (int16_T)((PMSMctrl_U.iabc_adc[0] - PMSMctrl_B.y_gd[0])
-    >> 1);
+  PMSMctrl_B.Sum5_p[0] = (int16_T)((PMSMctrl_U.iabc_adc[0] - PMSMctrl_B.y_a[0]) >>
+    1);
 
   /* DataTypeConversion: '<S8>/Data Type Conversion' */
   PMSMctrl_B.DataTypeConversion_p[0] = (real32_T)PMSMctrl_B.Sum5_p[0] * 2.0F;
@@ -1255,13 +1319,13 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_B.Gain[0] = PMSMctrl_P.iabcScale * PMSMctrl_B.Sum1_o[0];
 
   /* MATLAB Function: '<S8>/MATLAB Function' */
-  PMSMctrl_B.y_gd[1] = PMSMctrl_DWork.CurOff_m[1];
+  PMSMctrl_B.y_a[1] = PMSMctrl_DWork.CurOff_p[1];
 
   /* Sum: '<S8>/Sum5' incorporates:
    *  Inport: '<Root>/iabc_adc'
    */
-  PMSMctrl_B.Sum5_p[1] = (int16_T)((PMSMctrl_U.iabc_adc[1] - PMSMctrl_B.y_gd[1])
-    >> 1);
+  PMSMctrl_B.Sum5_p[1] = (int16_T)((PMSMctrl_U.iabc_adc[1] - PMSMctrl_B.y_a[1]) >>
+    1);
 
   /* DataTypeConversion: '<S8>/Data Type Conversion' */
   PMSMctrl_B.DataTypeConversion_p[1] = (real32_T)PMSMctrl_B.Sum5_p[1] * 2.0F;
@@ -1276,13 +1340,13 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_B.Gain[1] = PMSMctrl_P.iabcScale * PMSMctrl_B.Sum1_o[1];
 
   /* MATLAB Function: '<S8>/MATLAB Function' */
-  PMSMctrl_B.y_gd[2] = PMSMctrl_DWork.CurOff_m[2];
+  PMSMctrl_B.y_a[2] = PMSMctrl_DWork.CurOff_p[2];
 
   /* Sum: '<S8>/Sum5' incorporates:
    *  Inport: '<Root>/iabc_adc'
    */
-  PMSMctrl_B.Sum5_p[2] = (int16_T)((PMSMctrl_U.iabc_adc[2] - PMSMctrl_B.y_gd[2])
-    >> 1);
+  PMSMctrl_B.Sum5_p[2] = (int16_T)((PMSMctrl_U.iabc_adc[2] - PMSMctrl_B.y_a[2]) >>
+    1);
 
   /* DataTypeConversion: '<S8>/Data Type Conversion' */
   PMSMctrl_B.DataTypeConversion_p[2] = (real32_T)PMSMctrl_B.Sum5_p[2] * 2.0F;
@@ -1316,19 +1380,19 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Product: '<S17>/Product1' */
   PMSMctrl_B.Product1_g = PMSMctrl_B.Gain2_d * PMSMctrl_B.Switch2_g;
 
-  /* Gain: '<S139>/Gain1' */
+  /* Gain: '<S87>/Gain1' */
   PMSMctrl_B.Gain1_f = (int16_T)mul_s32_sr32(1891631104, PMSMctrl_B.Product1_g);
 
-  /* UnitDelay: '<S139>/Unit Delay' */
+  /* UnitDelay: '<S87>/Unit Delay' */
   PMSMctrl_B.UnitDelay = PMSMctrl_DWork.UnitDelay_DSTATE_h;
 
-  /* Sum: '<S139>/Sum1' */
+  /* Sum: '<S87>/Sum1' */
   PMSMctrl_B.Sum1_m1 = (int16_T)(PMSMctrl_B.Gain1_f + PMSMctrl_B.UnitDelay);
 
-  /* Gain: '<S139>/Gain' */
+  /* Gain: '<S87>/Gain' */
   PMSMctrl_B.Gain_h = (int16_T)((25736 * PMSMctrl_B.Sum1_m1) >> 23);
 
-  /* DataTypeConversion: '<S139>/Data Type Conversion' */
+  /* DataTypeConversion: '<S87>/Data Type Conversion' */
   theta_vf = (real32_T)PMSMctrl_B.Gain_h * 0.03125F;
 
   /* MATLAB Function: '<S8>/MATLAB Function3' incorporates:
@@ -1352,179 +1416,177 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Gain: '<S8>/Gain2' incorporates:
    *  Inport: '<Root>/QEP_cnt'
    */
-  PMSMctrl_B.Gain2 = mul_u32_loSR(3518437120U, PMSMctrl_U.QEP_cnt, 27U);
+  PMSMctrl_B.Gain2 = mul_u32_loSR(2199023360U, PMSMctrl_U.QEP_cnt, 25U);
 
   /* DataTypeConversion: '<S8>/Data Type Conversion3' */
-  PMSMctrl_B.DataTypeConversion3 = (uint16_T)PMSMctrl_B.Gain2;
+  theta_qep_cnt = (uint16_T)PMSMctrl_B.Gain2;
 
   /* MATLAB Function: '<S7>/MATLAB Function' incorporates:
    *  Inport: '<Root>/hall_state'
    */
   /* MATLAB Function 'PMSMctrl/EncInterface/MATLAB Function': '<S21>:1' */
-  if (PMSMctrl_DWork.OffsetState_g == 0) {
-    /* '<S21>:1:66' */
-    /* '<S21>:1:67' */
-    PMSMctrl_DWork.HallIn_j = PMSMctrl_U.hall_state;
-    if (PMSMctrl_DWork.HallIn_j == 1) {
-      /* '<S21>:1:69' */
-      /* '<S21>:1:70' */
-      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_n[0];
-    } else if (PMSMctrl_DWork.HallIn_j == 2) {
-      /* '<S21>:1:71' */
-      /* '<S21>:1:72' */
-      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_n[1];
-    } else if (PMSMctrl_DWork.HallIn_j == 3) {
-      /* '<S21>:1:73' */
-      /* '<S21>:1:74' */
-      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_n[2];
-    } else if (PMSMctrl_DWork.HallIn_j == 4) {
+  if (PMSMctrl_DWork.OffsetState_b == 0) {
+    /* '<S21>:1:72' */
+    /* '<S21>:1:73' */
+    PMSMctrl_DWork.HallIn_m = PMSMctrl_U.hall_state;
+    if (PMSMctrl_DWork.HallIn_m == 1) {
       /* '<S21>:1:75' */
       /* '<S21>:1:76' */
-      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_n[3];
-    } else if (PMSMctrl_DWork.HallIn_j == 5) {
+      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_i[0];
+    } else if (PMSMctrl_DWork.HallIn_m == 2) {
       /* '<S21>:1:77' */
       /* '<S21>:1:78' */
-      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_n[4];
-    } else if (PMSMctrl_DWork.HallIn_j == 6) {
+      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_i[1];
+    } else if (PMSMctrl_DWork.HallIn_m == 3) {
       /* '<S21>:1:79' */
       /* '<S21>:1:80' */
-      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_n[5];
-    } else {
+      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_i[2];
+    } else if (PMSMctrl_DWork.HallIn_m == 4) {
+      /* '<S21>:1:81' */
       /* '<S21>:1:82' */
-      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_n[5];
-    }
-
-    if (PMSMctrl_B.DataTypeConversion3 > PMSMctrl_DWork.AbsAngle_d) {
+      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_i[3];
+    } else if (PMSMctrl_DWork.HallIn_m == 5) {
+      /* '<S21>:1:83' */
+      /* '<S21>:1:84' */
+      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_i[4];
+    } else if (PMSMctrl_DWork.HallIn_m == 6) {
       /* '<S21>:1:85' */
       /* '<S21>:1:86' */
-      cnt_temp = (uint32_T)(65535 - PMSMctrl_B.DataTypeConversion3) +
-        PMSMctrl_DWork.AbsAngle_d;
+      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_i[5];
+    } else {
+      /* '<S21>:1:88' */
+      PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleStartTable_i[5];
+    }
+
+    if (theta_qep_cnt > PMSMctrl_DWork.AbsAngle_d) {
+      /* '<S21>:1:91' */
+      /* '<S21>:1:92' */
+      cnt_temp = (uint32_T)(65535 - theta_qep_cnt) + PMSMctrl_DWork.AbsAngle_d;
       if (cnt_temp > 65535U) {
         cnt_temp = 65535U;
       }
 
       PMSMctrl_DWork.AbsAngle_d = (uint16_T)cnt_temp;
     } else {
-      /* '<S21>:1:88' */
-      q0 = PMSMctrl_DWork.AbsAngle_d;
-      qY = (uint32_T)q0 - PMSMctrl_B.DataTypeConversion3;
-      if (qY > (uint32_T)q0) {
+      /* '<S21>:1:94' */
+      ref = PMSMctrl_DWork.AbsAngle_d;
+      qY = (uint32_T)ref - theta_qep_cnt;
+      if (qY > (uint32_T)ref) {
         qY = 0U;
       }
 
-      q0 = (int32_T)qY;
-      PMSMctrl_DWork.AbsAngle_d = (uint16_T)q0;
+      ref = (int32_T)qY;
+      PMSMctrl_DWork.AbsAngle_d = (uint16_T)ref;
     }
 
-    /* '<S21>:1:91' */
-    PMSMctrl_DWork.OffsetState_g = 1U;
-  } else if (PMSMctrl_DWork.OffsetState_g == 1) {
-    /* '<S21>:1:93' */
-    if (PMSMctrl_U.hall_state != PMSMctrl_DWork.HallIn_j) {
-      /* '<S21>:1:94' */
-      /* '<S21>:1:95' */
+    /* '<S21>:1:97' */
+    PMSMctrl_DWork.OffsetState_b = 1U;
+  } else if (PMSMctrl_DWork.OffsetState_b == 1) {
+    /* '<S21>:1:99' */
+    if (PMSMctrl_U.hall_state != PMSMctrl_DWork.HallIn_m) {
+      /* '<S21>:1:100' */
+      /* '<S21>:1:101' */
       switch (PMSMctrl_U.hall_state) {
        case 6:
-        if (PMSMctrl_DWork.HallIn_j == 2) {
-          /* '<S21>:1:97' */
-          /* '<S21>:1:98' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[1];
+        if (PMSMctrl_DWork.HallIn_m == 2) {
+          /* '<S21>:1:103' */
+          /* '<S21>:1:104' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[1];
         } else {
-          /* '<S21>:1:100' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[0];
+          /* '<S21>:1:106' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[0];
         }
         break;
 
        case 2:
-        if (PMSMctrl_DWork.HallIn_j == 3) {
-          /* '<S21>:1:103' */
-          /* '<S21>:1:104' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[2];
+        if (PMSMctrl_DWork.HallIn_m == 3) {
+          /* '<S21>:1:109' */
+          /* '<S21>:1:110' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[2];
         } else {
-          /* '<S21>:1:106' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[1];
+          /* '<S21>:1:112' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[1];
         }
         break;
 
        case 3:
-        if (PMSMctrl_DWork.HallIn_j == 1) {
-          /* '<S21>:1:109' */
-          /* '<S21>:1:110' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[3];
+        if (PMSMctrl_DWork.HallIn_m == 1) {
+          /* '<S21>:1:115' */
+          /* '<S21>:1:116' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[3];
         } else {
-          /* '<S21>:1:112' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[2];
+          /* '<S21>:1:118' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[2];
         }
         break;
 
        case 1:
-        if (PMSMctrl_DWork.HallIn_j == 5) {
-          /* '<S21>:1:115' */
-          /* '<S21>:1:116' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[4];
+        if (PMSMctrl_DWork.HallIn_m == 5) {
+          /* '<S21>:1:121' */
+          /* '<S21>:1:122' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[4];
         } else {
-          /* '<S21>:1:118' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[3];
+          /* '<S21>:1:124' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[3];
         }
         break;
 
        case 5:
-        if (PMSMctrl_DWork.HallIn_j == 4) {
-          /* '<S21>:1:121' */
-          /* '<S21>:1:122' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[5];
+        if (PMSMctrl_DWork.HallIn_m == 4) {
+          /* '<S21>:1:127' */
+          /* '<S21>:1:128' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[5];
         } else {
-          /* '<S21>:1:124' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[4];
+          /* '<S21>:1:130' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[4];
         }
         break;
 
        default:
-        if (PMSMctrl_DWork.HallIn_j == 6) {
-          /* '<S21>:1:127' */
-          /* '<S21>:1:128' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[0];
+        if (PMSMctrl_DWork.HallIn_m == 6) {
+          /* '<S21>:1:133' */
+          /* '<S21>:1:134' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[0];
         } else {
-          /* '<S21>:1:130' */
-          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_h[5];
+          /* '<S21>:1:136' */
+          PMSMctrl_DWork.AbsAngle_d = PMSMctrl_DWork.AngleTable_m[5];
         }
         break;
       }
 
-      /* '<S21>:1:133' */
-      PMSMctrl_DWork.OffsetState_g = 2U;
-      if (PMSMctrl_B.DataTypeConversion3 > PMSMctrl_DWork.AbsAngle_d) {
-        /* '<S21>:1:135' */
-        /* '<S21>:1:136' */
-        cnt_temp = (uint32_T)(65535 - PMSMctrl_B.DataTypeConversion3) +
-          PMSMctrl_DWork.AbsAngle_d;
+      /* '<S21>:1:139' */
+      PMSMctrl_DWork.OffsetState_b = 2U;
+      if (theta_qep_cnt > PMSMctrl_DWork.AbsAngle_d) {
+        /* '<S21>:1:141' */
+        /* '<S21>:1:142' */
+        cnt_temp = (uint32_T)(65535 - theta_qep_cnt) + PMSMctrl_DWork.AbsAngle_d;
         if (cnt_temp > 65535U) {
           cnt_temp = 65535U;
         }
 
         PMSMctrl_DWork.AbsAngle_d = (uint16_T)cnt_temp;
       } else {
-        /* '<S21>:1:138' */
-        q0 = PMSMctrl_DWork.AbsAngle_d;
-        qY = (uint32_T)q0 - PMSMctrl_B.DataTypeConversion3;
-        if (qY > (uint32_T)q0) {
+        /* '<S21>:1:144' */
+        ref = PMSMctrl_DWork.AbsAngle_d;
+        qY = (uint32_T)ref - theta_qep_cnt;
+        if (qY > (uint32_T)ref) {
           qY = 0U;
         }
 
-        q0 = (int32_T)qY;
-        PMSMctrl_DWork.AbsAngle_d = (uint16_T)q0;
+        ref = (int32_T)qY;
+        PMSMctrl_DWork.AbsAngle_d = (uint16_T)ref;
       }
     }
 
-    /* '<S21>:1:143' */
-    PMSMctrl_DWork.HallIn_j = PMSMctrl_U.hall_state;
+    /* '<S21>:1:149' */
+    PMSMctrl_DWork.HallIn_m = PMSMctrl_U.hall_state;
   } else {
-    /* '<S21>:1:145' */
-    PMSMctrl_DWork.HallIn_j = PMSMctrl_U.hall_state;
+    /* '<S21>:1:151' */
+    PMSMctrl_DWork.HallIn_m = PMSMctrl_U.hall_state;
   }
 
-  /* '<S21>:1:148' */
-  PMSMctrl_B.y_g = PMSMctrl_DWork.AbsAngle_d;
+  /* '<S21>:1:154' */
+  PMSMctrl_B.y_i5 = PMSMctrl_DWork.AbsAngle_d;
 
   /* End of MATLAB Function: '<S7>/MATLAB Function' */
 
@@ -1533,7 +1595,7 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
    */
   if (((uint8_T)0U) >= ((uint8_T)1U)) {
     /* Gain: '<S8>/Gain3' */
-    PMSMctrl_B.Gain3 = mul_u32_loSR(3518437120U, PMSMctrl_B.cnt_out, 27U);
+    PMSMctrl_B.Gain3 = mul_u32_loSR(2199023360U, PMSMctrl_B.cnt_out, 25U);
 
     /* DataTypeConversion: '<S8>/Data Type Conversion4' */
     PMSMctrl_B.DataTypeConversion4 = (uint16_T)PMSMctrl_B.Gain3;
@@ -1546,8 +1608,7 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.Switch1_e = PMSMctrl_B.Sum1_p;
   } else {
     /* Sum: '<S7>/Sum2' */
-    PMSMctrl_B.Sum2_l = (uint16_T)((uint32_T)PMSMctrl_B.DataTypeConversion3 +
-      PMSMctrl_B.y_g);
+    PMSMctrl_B.Sum2_l = (uint16_T)((uint32_T)theta_qep_cnt + PMSMctrl_B.y_i5);
 
     /* Sum: '<S7>/Sum5' incorporates:
      *  Constant: '<S7>/sinc_cmd2'
@@ -1583,54 +1644,54 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_B.sine_cosine2_o1 = multi_out;
   PMSMctrl_B.sine_cosine2_o2 = cosOut;
 
-  /* Product: '<S141>/Product' incorporates:
-   *  Constant: '<S141>/K1'
+  /* Product: '<S89>/Product' incorporates:
+   *  Constant: '<S89>/K1'
    */
   PMSMctrl_B.Product = PMSMctrl_B.sine_cosine2_o1 * 0.5F;
 
-  /* Product: '<S141>/Product1' incorporates:
-   *  Constant: '<S141>/K2'
+  /* Product: '<S89>/Product1' incorporates:
+   *  Constant: '<S89>/K2'
    */
   PMSMctrl_B.Product1_i = PMSMctrl_B.sine_cosine2_o2 * 0.866025388F;
 
-  /* Sum: '<S141>/Sum' */
+  /* Sum: '<S89>/Sum' */
   PMSMctrl_B.sinwt2pi3 = (0.0F - PMSMctrl_B.Product) - PMSMctrl_B.Product1_i;
 
-  /* Product: '<S141>/Product3' incorporates:
-   *  Constant: '<S141>/K1'
+  /* Product: '<S89>/Product3' incorporates:
+   *  Constant: '<S89>/K1'
    */
   PMSMctrl_B.Product3 = PMSMctrl_B.sine_cosine2_o2 * 0.5F;
 
-  /* Product: '<S141>/Product2' incorporates:
-   *  Constant: '<S141>/K2'
+  /* Product: '<S89>/Product2' incorporates:
+   *  Constant: '<S89>/K2'
    */
   PMSMctrl_B.Product2 = PMSMctrl_B.sine_cosine2_o1 * 0.866025388F;
 
-  /* Sum: '<S141>/Sum1' */
+  /* Sum: '<S89>/Sum1' */
   PMSMctrl_B.coswt2pi3 = PMSMctrl_B.Product2 - PMSMctrl_B.Product3;
 
-  /* Sum: '<S141>/Sum2' */
+  /* Sum: '<S89>/Sum2' */
   PMSMctrl_B.sinwt2pi3_m = (0.0F - PMSMctrl_B.sinwt2pi3) -
     PMSMctrl_B.sine_cosine2_o1;
 
-  /* Sum: '<S141>/Sum3' */
+  /* Sum: '<S89>/Sum3' */
   PMSMctrl_B.coswt2pi3_g = (0.0F - PMSMctrl_B.coswt2pi3) -
     PMSMctrl_B.sine_cosine2_o2;
 
-  /* Fcn: '<S141>/Fcn2' */
+  /* Fcn: '<S89>/Fcn2' */
   id = ((PMSMctrl_B.Switch1_l[0] * PMSMctrl_B.sine_cosine2_o1 +
          PMSMctrl_B.Switch1_l[1] * PMSMctrl_B.sinwt2pi3) + PMSMctrl_B.Switch1_l
         [2] * PMSMctrl_B.sinwt2pi3_m) * 0.666666687F;
 
-  /* SignalConversion: '<S18>/ConcatBufferAtVector ConcatenateIn1' */
+  /* SignalConversion generated from: '<S18>/Vector Concatenate' */
   PMSMctrl_B.VectorConcatenate[0] = id;
 
-  /* Fcn: '<S141>/Fcn1' */
+  /* Fcn: '<S89>/Fcn1' */
   iq = ((PMSMctrl_B.Switch1_l[0] * PMSMctrl_B.sine_cosine2_o2 +
          PMSMctrl_B.Switch1_l[1] * PMSMctrl_B.coswt2pi3) + PMSMctrl_B.Switch1_l
         [2] * PMSMctrl_B.coswt2pi3_g) * 0.666666687F;
 
-  /* SignalConversion: '<S18>/ConcatBufferAtVector ConcatenateIn2' */
+  /* SignalConversion generated from: '<S18>/Vector Concatenate' */
   PMSMctrl_B.VectorConcatenate[1] = iq;
 
   /* DataTypeConversion: '<S18>/Data Type Conversion' incorporates:
@@ -1656,10 +1717,10 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Gain: '<S18>/Gain2' */
   PMSMctrl_B.Gain2_m[2] = 12.0F * PMSMctrl_B.Memory[2];
 
-  /* SignalConversion: '<S18>/ConcatBufferAtVector Concatenate1In1' */
+  /* SignalConversion generated from: '<S18>/Vector Concatenate1' */
   PMSMctrl_B.v_dq[0] = PMSMctrl_B.Gain2_m[0];
 
-  /* SignalConversion: '<S18>/ConcatBufferAtVector Concatenate1In2' */
+  /* SignalConversion generated from: '<S18>/Vector Concatenate1' */
   PMSMctrl_B.v_dq[1] = PMSMctrl_B.Gain2_m[1];
 
   /* Memory: '<S18>/Memory1' */
@@ -1731,31 +1792,31 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* End of Switch: '<S16>/Switch2' */
 
   /* MATLAB Function: '<S16>/MATLAB Function1' */
-  /* MATLAB Function 'PMSMctrl/Switch/MATLAB Function1': '<S138>:1' */
-  /* '<S138>:1:15' */
+  /* MATLAB Function 'PMSMctrl/Switch/MATLAB Function1': '<S86>:1' */
+  /* '<S86>:1:15' */
   multi_out = (real32_T)sqrt(PMSMctrl_B.Switch2_m[0] * PMSMctrl_B.Switch2_m[0] +
     PMSMctrl_B.Switch2_m[1] * PMSMctrl_B.Switch2_m[1]);
   if (multi_out > PMSMctrl_MaxAmplitude) {
-    /* '<S138>:1:17' */
-    /* '<S138>:1:18' */
-    /* '<S138>:1:19' */
-    /* '<S138>:1:20' */
+    /* '<S86>:1:17' */
+    /* '<S86>:1:18' */
+    /* '<S86>:1:19' */
+    /* '<S86>:1:20' */
     PMSMctrl_B.vector_lim[0] = PMSMctrl_B.Switch2_m[0] * PMSMctrl_MaxAmplitude /
       multi_out;
     PMSMctrl_B.vector_lim[1] = PMSMctrl_B.Switch2_m[1] * PMSMctrl_MaxAmplitude /
       multi_out;
     PMSMctrl_B.vector_lim[2] = 0.0F;
 
-    /* '<S138>:1:21' */
+    /* '<S86>:1:21' */
     PMSMctrl_B.dq_is_lim[0] = 1;
     PMSMctrl_B.dq_is_lim[1] = 1;
   } else {
-    /* '<S138>:1:23' */
+    /* '<S86>:1:23' */
     PMSMctrl_B.vector_lim[0] = PMSMctrl_B.Switch2_m[0];
     PMSMctrl_B.vector_lim[1] = PMSMctrl_B.Switch2_m[1];
     PMSMctrl_B.vector_lim[2] = PMSMctrl_B.Switch2_m[2];
 
-    /* '<S138>:1:24' */
+    /* '<S86>:1:24' */
     PMSMctrl_B.dq_is_lim[0] = 0;
     PMSMctrl_B.dq_is_lim[1] = 0;
   }
@@ -1765,7 +1826,7 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Product: '<S19>/Product' incorporates:
    *  Constant: '<S19>/K1'
    */
-  /* '<S138>:1:27' */
+  /* '<S86>:1:27' */
   PMSMctrl_B.Product_m = PMSMctrl_B.sine_cosine2_o1 * 0.5F;
 
   /* Product: '<S19>/Product1' incorporates:
@@ -1816,7 +1877,7 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
    *  Constant: '<S1>/VF_GAIN1'
    */
   SVPWM_float_Outputs_wrapper(&PMSMctrl_B.Va, &PMSMctrl_B.Vb, &PMSMctrl_B.Vc,
-    &PMSMctrl_ConstP.pooled20, &PMSMctrl_B.SVmod_o1, &PMSMctrl_B.SVmod_o2,
+    &PMSMctrl_ConstP.pooled21, &PMSMctrl_B.SVmod_o1, &PMSMctrl_B.SVmod_o2,
     &PMSMctrl_B.SVmod_o3 );
 
   /* Sum: '<S9>/Sum' incorporates:
@@ -1899,7 +1960,7 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
    *  RateTransition: '<S1>/Rate Transition2'
    */
   if (PMSMctrl_M->Timing.RateInteraction.TID0_1 == 1) {
-    theta_speed = PMSMctrl_B.Switch2;
+    PMSMctrl_DWork.RateTransition1_Buffer = PMSMctrl_B.Switch2;
     spd_raw_calc = PMSMctrl_DWork.RateTransition2_Buffer0;
   }
 
@@ -1911,22 +1972,22 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Gain: '<S7>/Gain2' */
   n_by_m_raw_debug = 1.0F * spd_raw_n_by_m;
 
-  /* Gain: '<S31>/Gain3' */
+  /* Gain: '<S30>/Gain3' */
   ia_sar = 1.0F * PMSMctrl_B.Gain[0];
 
-  /* Gain: '<S31>/Gain6' */
+  /* Gain: '<S30>/Gain6' */
   ib_sar = 1.0F * PMSMctrl_B.Gain[1];
 
-  /* Gain: '<S31>/Gain7' */
+  /* Gain: '<S30>/Gain7' */
   ic_sar = 1.0F * PMSMctrl_B.Gain[2];
 
-  /* Gain: '<S32>/Gain10' */
+  /* Gain: '<S31>/Gain10' */
   ic_sinc = 1.0F * PMSMctrl_B.Gain7[1];
 
-  /* Gain: '<S32>/Gain8' */
+  /* Gain: '<S31>/Gain8' */
   ia_sinc = 1.0F * PMSMctrl_B.Sum3;
 
-  /* Gain: '<S32>/Gain9' */
+  /* Gain: '<S31>/Gain9' */
   ib_sinc = 1.0F * PMSMctrl_B.Gain7[0];
 
   /* DataTypeConversion: '<S8>/Data Type Conversion1' incorporates:
@@ -1942,10 +2003,10 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Gain: '<S8>/Gain1' */
   Vdc = PMSMctrl_P.vdcScale * PMSMctrl_B.Sum2_h;
 
-  /* Gain: '<S69>/ZeroGain' */
+  /* Gain: '<S64>/ZeroGain' */
   PMSMctrl_B.ZeroGain = 0.0F * PMSMctrl_B.Sum_i;
 
-  /* DeadZone: '<S69>/DeadZone' */
+  /* DeadZone: '<S64>/DeadZone' */
   if (PMSMctrl_B.Sum_i > PMSMctrl_P.iqMax) {
     PMSMctrl_B.DeadZone = PMSMctrl_B.Sum_i - PMSMctrl_P.iqMax;
   } else if (PMSMctrl_B.Sum_i >= PMSMctrl_P.iqMin) {
@@ -1954,12 +2015,12 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.DeadZone = PMSMctrl_B.Sum_i - PMSMctrl_P.iqMin;
   }
 
-  /* End of DeadZone: '<S69>/DeadZone' */
+  /* End of DeadZone: '<S64>/DeadZone' */
 
-  /* RelationalOperator: '<S69>/NotEqual' */
+  /* RelationalOperator: '<S64>/NotEqual' */
   PMSMctrl_B.NotEqual = (PMSMctrl_B.ZeroGain != PMSMctrl_B.DeadZone);
 
-  /* Signum: '<S69>/SignPreSat' */
+  /* Signum: '<S64>/SignPreSat' */
   multi_out = PMSMctrl_B.DeadZone;
   if (multi_out < 0.0F) {
     PMSMctrl_B.SignPreSat = -1.0F;
@@ -1969,17 +2030,17 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.SignPreSat = multi_out;
   }
 
-  /* End of Signum: '<S69>/SignPreSat' */
+  /* End of Signum: '<S64>/SignPreSat' */
 
-  /* DataTypeConversion: '<S69>/DataTypeConv1' */
+  /* DataTypeConversion: '<S64>/DataTypeConv1' */
   multi_out = (real32_T)fmod((real32_T)floor(PMSMctrl_B.SignPreSat), 256.0);
   PMSMctrl_B.DataTypeConv1 = (int8_T)(multi_out < 0.0F ? (int32_T)(int8_T)
     -(int8_T)(uint8_T)-multi_out : (int32_T)(int8_T)(uint8_T)multi_out);
 
-  /* Gain: '<S86>/Integral Gain' */
-  PMSMctrl_B.IntegralGain = PMSMctrl_P.Kiw * PMSMctrl_B.y_e;
+  /* Gain: '<S68>/Integral Gain' */
+  PMSMctrl_B.IntegralGain = PMSMctrl_P.Kiw * PMSMctrl_B.y_o;
 
-  /* Signum: '<S69>/SignPreIntegrator' */
+  /* Signum: '<S64>/SignPreIntegrator' */
   multi_out = PMSMctrl_B.IntegralGain;
   if (multi_out < 0.0F) {
     PMSMctrl_B.SignPreIntegrator = -1.0F;
@@ -1989,22 +2050,22 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.SignPreIntegrator = multi_out;
   }
 
-  /* End of Signum: '<S69>/SignPreIntegrator' */
+  /* End of Signum: '<S64>/SignPreIntegrator' */
 
-  /* DataTypeConversion: '<S69>/DataTypeConv2' */
+  /* DataTypeConversion: '<S64>/DataTypeConv2' */
   multi_out = (real32_T)fmod((real32_T)floor(PMSMctrl_B.SignPreIntegrator),
     256.0);
   PMSMctrl_B.DataTypeConv2 = (int8_T)(multi_out < 0.0F ? (int32_T)(int8_T)
     -(int8_T)(uint8_T)-multi_out : (int32_T)(int8_T)(uint8_T)multi_out);
 
-  /* RelationalOperator: '<S69>/Equal1' */
+  /* RelationalOperator: '<S64>/Equal1' */
   PMSMctrl_B.Equal1 = (PMSMctrl_B.DataTypeConv1 == PMSMctrl_B.DataTypeConv2);
 
-  /* Logic: '<S69>/AND3' */
+  /* Logic: '<S64>/AND3' */
   PMSMctrl_B.AND3 = (PMSMctrl_B.NotEqual && PMSMctrl_B.Equal1);
 
-  /* Switch: '<S69>/Switch' incorporates:
-   *  Constant: '<S69>/Constant1'
+  /* Switch: '<S64>/Switch' incorporates:
+   *  Constant: '<S64>/Constant1'
    */
   if (PMSMctrl_B.AND3) {
     PMSMctrl_B.Switch_b = 0.0F;
@@ -2012,7 +2073,20 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
     PMSMctrl_B.Switch_b = PMSMctrl_B.IntegralGain;
   }
 
-  /* End of Switch: '<S69>/Switch' */
+  /* End of Switch: '<S64>/Switch' */
+
+  /* Switch: '<S14>/Switch4' incorporates:
+   *  Constant: '<S14>/SpdMul5'
+   *  Constant: '<S14>/SpdMul6'
+   *  Constant: '<S1>/SYS_CMD'
+   */
+  if (PMSMctrl_P.SYSTEM_CMD > ((uint8_T)0U)) {
+    PMSMctrl_B.Switch4_b = 0.5F;
+  } else {
+    PMSMctrl_B.Switch4_b = 0.0F;
+  }
+
+  /* End of Switch: '<S14>/Switch4' */
   /* Switch: '<S15>/Switch1' incorporates:
    *  Switch: '<S15>/Switch4'
    */
@@ -2021,18 +2095,18 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   } else {
     if (PMSMctrl_B.Abs >= 0.0F) {
       /* Switch: '<S15>/Switch4' */
-      PMSMctrl_B.Switch4_b = spd_raw_n_by_m;
+      PMSMctrl_B.Switch4_bi = spd_raw_n_by_m;
     } else {
       /* Switch: '<S15>/Switch4' */
-      PMSMctrl_B.Switch4_b = spd_raw_n_by_1;
+      PMSMctrl_B.Switch4_bi = spd_raw_n_by_1;
     }
 
-    speed_raw = PMSMctrl_B.Switch4_b;
+    speed_raw = PMSMctrl_B.Switch4_bi;
   }
 
   /* End of Switch: '<S15>/Switch1' */
 
-  /* Sum: '<S141>/Sum4' */
+  /* Sum: '<S89>/Sum4' */
   PMSMctrl_B.tmpForInput[0] = PMSMctrl_B.Switch1_l[0];
   PMSMctrl_B.tmpForInput[1] = PMSMctrl_B.Switch1_l[1];
   PMSMctrl_B.tmpForInput[2] = PMSMctrl_B.Switch1_l[2];
@@ -2043,15 +2117,15 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   PMSMctrl_B.tmpForInput[7] = PMSMctrl_B.sinwt2pi3_m;
   PMSMctrl_B.tmpForInput[8] = PMSMctrl_B.coswt2pi3_g;
   cosOut = -0.0F;
-  for (q0 = 0; q0 < 9; q0++) {
-    cosOut += PMSMctrl_B.tmpForInput[q0];
+  for (ref = 0; ref < 9; ref++) {
+    cosOut += PMSMctrl_B.tmpForInput[ref];
   }
 
   PMSMctrl_B.Sum4_d = cosOut;
 
-  /* End of Sum: '<S141>/Sum4' */
+  /* End of Sum: '<S89>/Sum4' */
 
-  /* Gain: '<S141>/Gain1' */
+  /* Gain: '<S89>/Gain1' */
   PMSMctrl_B.Gain1 = 0.333333343F * PMSMctrl_B.Sum4_d;
 
   /* Constant: '<S1>/SYS_CMD1' */
@@ -2060,16 +2134,16 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
   /* Constant: '<S1>/SYS_CMD2' */
   PMSMctrl_B.SYS_CMD2 = PMSMctrl_P.MOTOR_CFG;
 
-  /* Update for UnitDelay: '<S34>/Unit  Delay' */
+  /* Update for UnitDelay: '<S33>/Unit  Delay' */
   PMSMctrl_DWork.UnitDelay_DSTATE = PMSMctrl_B.y;
 
-  /* Update for UnitDelay: '<S33>/Unit  Delay' */
+  /* Update for UnitDelay: '<S32>/Unit  Delay' */
   PMSMctrl_DWork.UnitDelay_DSTATE_i = PMSMctrl_B.y_i;
 
-  /* Update for UnitDelay: '<S140>/Unit Delay1' */
+  /* Update for UnitDelay: '<S88>/Unit Delay1' */
   PMSMctrl_DWork.UnitDelay1_DSTATE = PMSMctrl_B.Sum4_o;
 
-  /* Update for UnitDelay: '<S39>/Unit  Delay' */
+  /* Update for UnitDelay: '<S38>/Unit  Delay' */
   PMSMctrl_DWork.UnitDelay_DSTATE_e = speed_ref_lim;
 
   /* Update for DiscreteStateSpace: '<S20>/Discrete State-Space' */
@@ -2081,19 +2155,19 @@ void PMSMctrl_step0(void)              /* Sample time: [0.0001s, 0.0s] */
                   sizeof(real32_T)*1);
   }
 
-  /* Update for DiscreteIntegrator: '<S96>/Integrator' incorporates:
+  /* Update for DiscreteIntegrator: '<S71>/Integrator' incorporates:
    *  Constant: '<S1>/SYS_CMD'
    */
   PMSMctrl_DWork.Integrator_DSTATE += 0.0001F * PMSMctrl_B.Switch_b;
   PMSMctrl_DWork.Integrator_PrevResetState = (int8_T)(PMSMctrl_P.SYSTEM_CMD > 0);
 
-  /* Update for DiscreteIntegrator: '<S78>/Filter' incorporates:
+  /* Update for DiscreteIntegrator: '<S66>/Filter' incorporates:
    *  Constant: '<S1>/SYS_CMD'
    */
   PMSMctrl_DWork.Filter_DSTATE += 0.0001F * PMSMctrl_B.FilterCoefficient;
   PMSMctrl_DWork.Filter_PrevResetState = (int8_T)(PMSMctrl_P.SYSTEM_CMD > 0);
 
-  /* Update for UnitDelay: '<S139>/Unit Delay' */
+  /* Update for UnitDelay: '<S87>/Unit Delay' */
   PMSMctrl_DWork.UnitDelay_DSTATE_h = PMSMctrl_B.Sum1_m1;
 
   /* Update for Memory: '<S18>/Memory' */
@@ -2112,21 +2186,24 @@ void PMSMctrl_step1(void)              /* Sample time: [0.001s, 0.0s] */
   real32_T temp;
   real32_T y;
 
+  /* RateTransition: '<S2>/Rate Transition1' */
+  theta_speed = PMSMctrl_DWork.RateTransition1_Buffer;
+
   /* Outputs for Atomic SubSystem: '<S1>/SpeedCalc' */
   /* MATLAB Function: '<S13>/MATLAB Function' */
-  /* MATLAB Function 'PMSMctrl/SpeedCalc/MATLAB Function': '<S36>:1' */
+  /* MATLAB Function 'PMSMctrl/SpeedCalc/MATLAB Function': '<S35>:1' */
   if (!PMSMctrl_DWork.u_old_not_empty) {
-    /* '<S36>:1:14' */
-    /* '<S36>:1:15' */
+    /* '<S35>:1:14' */
+    /* '<S35>:1:15' */
     PMSMctrl_DWork.u_old = theta_speed;
     PMSMctrl_DWork.u_old_not_empty = true;
   }
 
-  /* '<S36>:1:18' */
+  /* '<S35>:1:18' */
   temp = theta_speed - PMSMctrl_DWork.u_old;
   if ((real32_T)fabs(temp) > 3.1415926535897931) {
-    /* '<S36>:1:20' */
-    /* '<S36>:1:21' */
+    /* '<S35>:1:20' */
+    /* '<S35>:1:21' */
     if (temp < 0.0F) {
       y = -1.0F;
     } else if (temp > 0.0F) {
@@ -2138,10 +2215,10 @@ void PMSMctrl_step1(void)              /* Sample time: [0.001s, 0.0s] */
     temp -= y * 3.14159274F * 2.0F;
   }
 
-  /* '<S36>:1:24' */
+  /* '<S35>:1:24' */
   PMSMctrl_DWork.u_old = theta_speed;
 
-  /* '<S36>:1:26' */
+  /* '<S35>:1:26' */
   speed_debug = temp;
 
   /* End of MATLAB Function: '<S13>/MATLAB Function' */
@@ -2149,47 +2226,47 @@ void PMSMctrl_step1(void)              /* Sample time: [0.001s, 0.0s] */
   /* Gain: '<S13>/Gain3' */
   PMSMctrl_B.Gain3_p = 2387.32422F * speed_debug;
 
-  /* DiscreteStateSpace: '<S35>/Discrete State-Space' */
+  /* DiscreteStateSpace: '<S34>/Discrete State-Space' */
   {
-    PMSMctrl_B.DiscreteStateSpace = 0.285714298F*
+    PMSMctrl_B.DiscreteStateSpace = 0.666666627F*
       PMSMctrl_DWork.DiscreteStateSpace_DSTATE_f;
-    PMSMctrl_B.DiscreteStateSpace += 0.142857149F*PMSMctrl_B.Gain3_p;
+    PMSMctrl_B.DiscreteStateSpace += 0.333333313F*PMSMctrl_B.Gain3_p;
   }
 
   /* MATLAB Function: '<S13>/MATLAB Function1' */
-  /* MATLAB Function 'PMSMctrl/SpeedCalc/MATLAB Function1': '<S37>:1' */
+  /* MATLAB Function 'PMSMctrl/SpeedCalc/MATLAB Function1': '<S36>:1' */
   if (PMSMctrl_B.Gain3_p > 0.0F) {
-    /* '<S37>:1:18' */
-    /* '<S37>:1:19' */
+    /* '<S36>:1:18' */
+    /* '<S36>:1:19' */
     PMSMctrl_DWork.old_sign = 1.0F;
   } else {
     if (PMSMctrl_B.Gain3_p < 0.0F) {
-      /* '<S37>:1:20' */
-      /* '<S37>:1:21' */
+      /* '<S36>:1:20' */
+      /* '<S36>:1:21' */
       PMSMctrl_DWork.old_sign = -1.0F;
     }
   }
 
-  /* '<S37>:1:26' */
-  PMSMctrl_B.y_ej = PMSMctrl_DWork.old_sign;
+  /* '<S36>:1:26' */
+  PMSMctrl_B.y_oa = PMSMctrl_DWork.old_sign;
 
   /* End of MATLAB Function: '<S13>/MATLAB Function1' */
 
-  /* Update for DiscreteStateSpace: '<S35>/Discrete State-Space' */
+  /* Update for DiscreteStateSpace: '<S34>/Discrete State-Space' */
   {
     real32_T xnew[1];
-    xnew[0] = 0.714285731F*PMSMctrl_DWork.DiscreteStateSpace_DSTATE_f;
-    xnew[0] += 0.857142866F*PMSMctrl_B.Gain3_p;
+    xnew[0] = 0.333333343F*PMSMctrl_DWork.DiscreteStateSpace_DSTATE_f;
+    xnew[0] += 0.666666687F*PMSMctrl_B.Gain3_p;
     (void) memcpy(&PMSMctrl_DWork.DiscreteStateSpace_DSTATE_f, xnew,
                   sizeof(real32_T)*1);
   }
 
   /* End of Outputs for SubSystem: '<S1>/SpeedCalc' */
 
-  /* Update for RateTransition: '<S1>/Rate Transition1' */
+  /* RateTransition: '<S1>/Rate Transition1' */
   PMSMctrl_DWork.RateTransition1_Buffer0 = PMSMctrl_B.DiscreteStateSpace;
 
-  /* Update for RateTransition: '<S1>/Rate Transition2' */
+  /* RateTransition: '<S1>/Rate Transition2' */
   PMSMctrl_DWork.RateTransition2_Buffer0 = PMSMctrl_B.Gain3_p;
 }
 
@@ -2215,6 +2292,7 @@ void PMSMctrl_initialize(void)
   speed_ff = 0.0F;
   Nref = 0.0F;
   speed_ref = 0.0F;
+  w_ref = 0.0F;
   speed_ref_lim = 0.0F;
   spd_fil_calc = 0.0F;
   spd_raw_n_by_m = 0.0F;
@@ -2227,7 +2305,6 @@ void PMSMctrl_initialize(void)
   theta_enc = 0.0F;
   id = 0.0F;
   iq = 0.0F;
-  theta_speed = 0.0F;
   n_by_m_fil_debug = 0.0F;
   n_by_m_raw_debug = 0.0F;
   ia_sar = 0.0F;
@@ -2239,34 +2316,48 @@ void PMSMctrl_initialize(void)
   Vdc = 0.0F;
   spd_raw_calc = 0.0F;
   speed_raw = 0.0F;
+  theta_speed = 0.0F;
+  w_step = 0.0F;
   iq_ref_step = 0.0F;
   speed_debug = 0.0F;
   pos_offset = 0.0F;
   speed_meas_raw_n_by_1 = 0.0F;
   speed_meas_raw_n_by_m = 0.0F;
+  theta_qep_cnt = 0U;
 
   /* states (dwork) */
   (void) memset((void *)&PMSMctrl_DWork, 0,
                 sizeof(D_Work_PMSMctrl));
 
   {
-    static const uint16_T tmp[6] = { 10923U, 54613U, 0U, 32768U, 21845U, 43691U
-    };
-
-    static const uint16_T tmp_0[6] = { 38229U, 49152U, 60075U, 5461U, 16384U,
-      27307U };
-
     int32_T i;
+    static const uint16_T tmp[6] = { 16384U, 60075U, 5461U, 38229U, 27307U,
+      49152U };
 
-    /* InitializeConditions for DiscreteIntegrator: '<S96>/Integrator' */
+    static const uint16_T tmp_0[6] = { 43691U, 54613U, 0U, 10923U, 21845U,
+      32768U };
+
+    /* InitializeConditions for DiscreteIntegrator: '<S71>/Integrator' */
     PMSMctrl_DWork.Integrator_PrevResetState = 2;
 
-    /* InitializeConditions for DiscreteIntegrator: '<S78>/Filter' */
+    /* InitializeConditions for DiscreteIntegrator: '<S66>/Filter' */
     PMSMctrl_DWork.Filter_PrevResetState = 2;
 
-    /* SystemInitialize for MATLAB Function: '<S8>/MATLAB Function2' */
-    PMSMctrl_DWork.cnt_old = MAX_uint32_T;
-    PMSMctrl_DWork.turn_cnt = 0;
+    /* SystemInitialize for MATLAB Function: '<S7>/MATLAB Function' */
+    for (i = 0; i < 6; i++) {
+      PMSMctrl_DWork.AngleStartTable_i[i] = tmp[i];
+      PMSMctrl_DWork.AngleTable_m[i] = tmp_0[i];
+    }
+
+    PMSMctrl_DWork.OffsetState_b = 0U;
+    PMSMctrl_DWork.AbsAngle_d = 0U;
+    PMSMctrl_DWork.HallIn_m = 5U;
+
+    /* End of SystemInitialize for MATLAB Function: '<S7>/MATLAB Function' */
+
+    /* SystemInitialize for MATLAB Function: '<S7>/MATLAB Function3' */
+    PMSMctrl_DWork.pos_rst_old = 0U;
+    PMSMctrl_DWork.position_offset = 0.0F;
 
     /* SystemInitialize for MATLAB Function: '<S7>/MATLAB Function4' */
     PMSMctrl_DWork.AngleTable_not_empty = false;
@@ -2275,12 +2366,15 @@ void PMSMctrl_initialize(void)
     PMSMctrl_DWork.AbsAngle = 0.0F;
     PMSMctrl_DWork.HallIn = 5U;
 
-    /* SystemInitialize for MATLAB Function: '<S7>/MATLAB Function3' */
-    PMSMctrl_DWork.pos_rst_old = 0U;
-    PMSMctrl_DWork.position_offset = 0.0F;
-
-    /* SystemInitialize for MATLAB Function: '<S14>/MATLAB Function1' */
-    PMSMctrl_DWork.sample_count = 0U;
+    /* SystemInitialize for MATLAB Function: '<S8>/MATLAB Function' */
+    PMSMctrl_DWork.CurOff_p[0] = 0;
+    PMSMctrl_DWork.CurOff_p[1] = 0;
+    PMSMctrl_DWork.CurOff_p[2] = 0;
+    PMSMctrl_DWork.SysCmd_old_m = 0U;
+    PMSMctrl_DWork.ia_acc_m = 0.0F;
+    PMSMctrl_DWork.ib_acc_j = 0.0F;
+    PMSMctrl_DWork.ic_acc = 0.0F;
+    PMSMctrl_DWork.sample_o = 0;
 
     /* SystemInitialize for MATLAB Function: '<S8>/MATLAB Function1' */
     PMSMctrl_DWork.CurOff[0] = 0.0F;
@@ -2290,27 +2384,10 @@ void PMSMctrl_initialize(void)
     PMSMctrl_DWork.ib_acc = 0.0F;
     PMSMctrl_DWork.sample = 0;
 
-    /* SystemInitialize for MATLAB Function: '<S8>/MATLAB Function' */
-    PMSMctrl_DWork.CurOff_m[0] = 0;
-    PMSMctrl_DWork.CurOff_m[1] = 0;
-    PMSMctrl_DWork.CurOff_m[2] = 0;
-    PMSMctrl_DWork.SysCmd_old_o = 0U;
-    PMSMctrl_DWork.ia_acc_i = 0.0F;
-    PMSMctrl_DWork.ib_acc_m = 0.0F;
-    PMSMctrl_DWork.ic_acc = 0.0F;
-    PMSMctrl_DWork.sample_b = 0;
+    /* SystemInitialize for MATLAB Function: '<S8>/MATLAB Function2' */
+    PMSMctrl_DWork.cnt_old = MAX_uint32_T;
+    PMSMctrl_DWork.turn_cnt = 0;
 
-    /* SystemInitialize for MATLAB Function: '<S7>/MATLAB Function' */
-    for (i = 0; i < 6; i++) {
-      PMSMctrl_DWork.AngleStartTable_n[i] = tmp[i];
-      PMSMctrl_DWork.AngleTable_h[i] = tmp_0[i];
-    }
-
-    PMSMctrl_DWork.OffsetState_g = 0U;
-    PMSMctrl_DWork.AbsAngle_d = 0U;
-    PMSMctrl_DWork.HallIn_j = 5U;
-
-    /* End of SystemInitialize for MATLAB Function: '<S7>/MATLAB Function' */
     /* SystemInitialize for MATLAB Function: '<S13>/MATLAB Function' */
     PMSMctrl_DWork.u_old_not_empty = false;
 
@@ -2318,6 +2395,12 @@ void PMSMctrl_initialize(void)
     PMSMctrl_DWork.old_sign = 1.0F;
 
     /* End of SystemInitialize for SubSystem: '<S1>/SpeedCalc' */
+
+    /* SystemInitialize for MATLAB Function: '<S14>/MATLAB Function1' */
+    PMSMctrl_DWork.sample_count_f = 0U;
+
+    /* SystemInitialize for MATLAB Function: '<S14>/MATLAB Function2' */
+    PMSMctrl_DWork.sample_count = 0U;
   }
 }
 

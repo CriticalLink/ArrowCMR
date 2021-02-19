@@ -39,60 +39,78 @@
 #include "socal/alt_uart.h"
 #include "socal/hps.h"
 #include "socal/socal.h"
+#include <platform.h>
 
 #define STDOUT_FILENO 1
-
+static int sbConsoleEnabled = 1;
 int _close(int file)
 {
-    /* Succeeds only for STDOUT */
-    return (file == STDOUT_FILENO) ? 0 : -1;
+	/* Succeeds only for STDOUT */
+	return (file == STDOUT_FILENO) ? 0 : -1;
 }
 
 int _fstat(int file, void *st)
 {
-    /* Succeeds only for STDOUT */
-    return (file == STDOUT_FILENO) ? 0 : -1;
+	/* Succeeds only for STDOUT */
+	return (file == STDOUT_FILENO) ? 0 : -1;
 }
 
 int _isatty(int file)
 {
-    /* Succeeds only for STDOUT */
-    return (file == STDOUT_FILENO) ? 1 : -1;
+	/* Succeeds only for STDOUT */
+	return (file == STDOUT_FILENO) ? 1 : -1;
 }
 
 off_t _lseek(int file, off_t ptr, int dir)
 {
-    /* Succeeds only for STDOUT */
-    return (file == STDOUT_FILENO) ? 0 : -1;
+	/* Succeeds only for STDOUT */
+	return (file == STDOUT_FILENO) ? 0 : -1;
 }
 
 int _read(int file, void *ptr, size_t len)
 {
-    /* Always fails */
-    return -1;
+	/* Always fails */
+	return -1;
 }
 
 int _write(int file, char * ptr, unsigned len, int flag )
 {
-    /* Fails if not STDOUT */
-    if(file != STDOUT_FILENO)
-    {
-        return -1;
-    }
+	/* Fails if not STDOUT */
+	if(file != STDOUT_FILENO)
+	{
+		return -1;
+	}
+	if(!sbConsoleEnabled) {
+		return -1;
+	}
+	if(g_uart0_buffer.handle) {
+		size_t size_written = 0;
+		ALT_STATUS_CODE status = alt_16550_buffer_write_raw(&g_uart0_buffer,
+				ptr,
+				len,
+				&size_written);
+		if(ALT_E_SUCCESS == status) {
+			len = size_written;
+		}
 
-    /* Print each character to UART */
-    for(int i=0; i<len; i++)
-    {
-        /* Wait until THR is empty*/
-        while(1 != ALT_UART_LSR_THRE_GET(alt_read_word(ALT_UART0_LSR_ADDR)))
-        {
-        }
+	}
+	else {
+		/* Print each character to UART */
+		for(int i=0; i<len; i++)
+		{
+			/* Wait until THR is empty*/
+			while(1 != ALT_UART_LSR_THRE_GET(alt_read_word(ALT_UART0_LSR_ADDR)))
+			{
+			}
 
-        /* Write character to THR */
-        alt_write_word(ALT_UART0_RBR_THR_DLL_ADDR, ptr[i]);
-    }
-
-    /* All printed fine */
-    return len;
+			/* Write character to THR */
+			alt_write_word(ALT_UART0_RBR_THR_DLL_ADDR, ptr[i]);
+		}
+	}
+	/* All printed fine */
+	return len;
 }
 
+void enable_console(int enable) {
+	sbConsoleEnabled = enable;
+}
