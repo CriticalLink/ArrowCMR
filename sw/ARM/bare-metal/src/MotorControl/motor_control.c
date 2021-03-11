@@ -85,6 +85,14 @@ void aMcModeHandler(MODE_TYPE mode_cmd){
 		PMSMctrl_P.VF_CTRL = 1;
 		SetupSincNonOptContinious();
 	}
+	else if(mode_cmd == MODE5){
+		PMSMctrl_P.VF_CTRL = 3;
+		SetupSincOptFlush();
+	}
+	else if(mode_cmd == MODE6){
+		PMSMctrl_P.VF_CTRL = 4;
+		SetupSincOptFlush();
+	}
   }
 }
 
