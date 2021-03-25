@@ -34,7 +34,7 @@ void aMcInit(void);
 void aMcCmd(MC_EVENT);
 void sMcTask(void);
 void sMcAlgorithm(void);
-void aMcModeHandler(uint8_t);
+void aMcModeHandler(MODE_TYPE);
 MODE_TYPE GetMode(void);
 
 /*=============  EXTERNAL VARIABLES  =============*/
