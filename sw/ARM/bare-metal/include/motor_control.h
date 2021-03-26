@@ -20,11 +20,13 @@ typedef enum {
 } MC_EVENT;
 
 typedef enum {
-  MODE0=0,
-  MODE1=1,
-  MODE2=2,
-  MODE3=3,
-  MODE4=4
+  MODE0=0,  // Closed loop FOC
+  MODE1=1,  // Open loop
+  MODE2=2,  // Position Control
+  MODE3=3,  // Open loop, continuous SINC, correct alignment
+  MODE4=4,  // Open loop, continuous SINC, incorrect alignment
+  MODE5=5,	// Current loop step response
+  MODE6=6   // Speed loop step response
 } MODE_TYPE;
 
 /*=============  EXTERNAL FUNCTIONS  =============*/
@@ -32,7 +34,7 @@ void aMcInit(void);
 void aMcCmd(MC_EVENT);
 void sMcTask(void);
 void sMcAlgorithm(void);
-void aMcModeHandler(uint8_t);
+void aMcModeHandler(MODE_TYPE);
 MODE_TYPE GetMode(void);
 
 /*=============  EXTERNAL VARIABLES  =============*/

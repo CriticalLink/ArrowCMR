@@ -43,7 +43,7 @@ Description:
 
 // Minimum pulse-width filter on ABZ and Hall UVW lines
 #define MPW_CNT_LIM     256    // 2.56 us @ 100 MHz clock
-#define CNT_WRAP 		3999
+#define CNT_WRAP 		9999
 #define M 				4
 
 void QEP_IP_mWriteReg(uint32_t base, uint32_t offset, uint32_t val) { 
