@@ -181,7 +181,10 @@ class AdiConnectFrame(AdiFrame):
         self.connect_cb = connect_cb
         self.disconnect_cb = disconnect_cb
         self.serial = serial
-        self.available_ports = self.serial.discoverPorts()
+        self.available_ports = self.serial.discoverPorts()        
+        if len(self.available_ports) == 0:
+            self.available_ports = ["No Devices Found"]
+            print(f"{self.available_ports}")
         self.comSelected = tk.StringVar()
 
         # init parent
@@ -253,6 +256,9 @@ class AdiConnectFrame(AdiFrame):
 
     def update_ports(self, *args):
         self.available_ports = self.serial.discoverPorts()
+        if len(self.available_ports) == 0:
+            self.available_ports = ["No Devices Found"]
+            print(f"{self.available_ports}")            
         self.comSelected.set('')
         self.comSelect['menu'].delete(0, 'end')
         for port in self.available_ports:
