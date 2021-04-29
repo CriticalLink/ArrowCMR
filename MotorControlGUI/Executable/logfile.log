@@ -31,3 +31,102 @@
 2021-03-30 08:56:54,550 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 80, 82], bytes:bytearray(b'\xffPR')
 2021-03-30 08:56:54,550 : INFO : libs.adiSerial :          disconnect(): disconnect
 2021-03-30 08:56:54,550 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-28 10:19:29,442 : INFO : libs.adiSerial :             connect(): connect
+2021-04-28 10:19:29,471 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-28 10:19:29,471 : DEBUG : libs.adiMotor :           configure(): Sending configuration message [255, 70, 16, 0, 51, 51, 11, 184, 10, 0, 0]
+2021-04-28 10:19:29,471 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 70, 16, 0, 51, 51, 11, 184, 10, 0, 0], bytes:bytearray(b'\xffF\x10\x0033\x0b\xb8\n\x00\x00')
+2021-04-28 10:19:29,472 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-28 10:19:29,472 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 53, 8], bytes:bytearray(b'\xff5\x08')
+2021-04-28 10:19:29,472 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 64, 0, 200], bytes:bytearray(b'\xff@\x00\xc8')
+2021-04-28 10:19:29,472 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-28 10:19:29,472 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-28 10:19:29,473 : DEBUG : libs.adiMotor :         sendRxSetup(): Sending rx for channel0 @address: 0x00148f30
+2021-04-28 10:19:29,473 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 0, 0, 20, 143, 48], bytes:bytearray(b'\xff6\x00\x00\x14\x8f0')
+2021-04-28 10:19:29,474 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 1, 0, 20, 143, 49], bytes:bytearray(b'\xff6\x01\x00\x14\x8f1')
+2021-04-28 10:19:29,474 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 2, 0, 20, 143, 50], bytes:bytearray(b'\xff6\x02\x00\x14\x8f2')
+2021-04-28 10:19:29,474 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 3, 0, 20, 143, 51], bytes:bytearray(b'\xff6\x03\x00\x14\x8f3')
+2021-04-28 10:19:29,474 : DEBUG : libs.adiMotor :         sendRxSetup(): Sending rx for channel4 @address: 0x00148f28
+2021-04-28 10:19:29,474 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 4, 0, 20, 143, 40], bytes:bytearray(b'\xff6\x04\x00\x14\x8f(')
+2021-04-28 10:19:29,475 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 5, 0, 20, 143, 41], bytes:bytearray(b'\xff6\x05\x00\x14\x8f)')
+2021-04-28 10:19:29,475 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 6, 0, 20, 143, 42], bytes:bytearray(b'\xff6\x06\x00\x14\x8f*')
+2021-04-28 10:19:29,475 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 7, 0, 20, 143, 43], bytes:bytearray(b'\xff6\x07\x00\x14\x8f+')
+2021-04-28 10:19:29,576 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 0, 0, 20, 143, 48], bytes:bytearray(b'\xff6\x00\x00\x14\x8f0')
+2021-04-28 10:19:29,577 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 1, 0, 20, 143, 49], bytes:bytearray(b'\xff6\x01\x00\x14\x8f1')
+2021-04-28 10:19:29,577 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 2, 0, 20, 143, 50], bytes:bytearray(b'\xff6\x02\x00\x14\x8f2')
+2021-04-28 10:19:29,578 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 3, 0, 20, 143, 51], bytes:bytearray(b'\xff6\x03\x00\x14\x8f3')
+2021-04-28 10:19:29,579 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 4, 0, 20, 143, 40], bytes:bytearray(b'\xff6\x04\x00\x14\x8f(')
+2021-04-28 10:19:29,579 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 5, 0, 20, 143, 41], bytes:bytearray(b'\xff6\x05\x00\x14\x8f)')
+2021-04-28 10:19:29,580 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 6, 0, 20, 143, 42], bytes:bytearray(b'\xff6\x06\x00\x14\x8f*')
+2021-04-28 10:19:29,580 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 7, 0, 20, 143, 43], bytes:bytearray(b'\xff6\x07\x00\x14\x8f+')
+2021-04-28 10:19:29,581 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-28 10:19:49,629 : DEBUG : libs.adiMotor :            setSpeed(): Speed set message [255, 90, 0, 0]
+2021-04-28 10:19:49,629 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 90, 0, 0], bytes:bytearray(b'\xffZ\x00\x00')
+2021-04-28 10:19:49,630 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 80, 82], bytes:bytearray(b'\xffPR')
+2021-04-28 10:19:49,630 : INFO : libs.adiSerial :          disconnect(): disconnect
+2021-04-28 10:19:49,630 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-29 07:46:01,970 : INFO : libs.adiSerial :             connect(): connect
+2021-04-29 07:46:01,997 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-29 07:46:01,998 : DEBUG : libs.adiMotor :           configure(): Sending configuration message [255, 70, 16, 0, 51, 51, 11, 184, 10, 0, 0]
+2021-04-29 07:46:01,998 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 70, 16, 0, 51, 51, 11, 184, 10, 0, 0], bytes:bytearray(b'\xffF\x10\x0033\x0b\xb8\n\x00\x00')
+2021-04-29 07:46:01,998 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-29 07:46:01,999 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 53, 8], bytes:bytearray(b'\xff5\x08')
+2021-04-29 07:46:01,999 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 64, 0, 200], bytes:bytearray(b'\xff@\x00\xc8')
+2021-04-29 07:46:01,999 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-29 07:46:01,999 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-29 07:46:01,999 : DEBUG : libs.adiMotor :         sendRxSetup(): Sending rx for channel0 @address: 0x00148f30
+2021-04-29 07:46:01,999 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 0, 0, 20, 143, 48], bytes:bytearray(b'\xff6\x00\x00\x14\x8f0')
+2021-04-29 07:46:02,000 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 1, 0, 20, 143, 49], bytes:bytearray(b'\xff6\x01\x00\x14\x8f1')
+2021-04-29 07:46:02,000 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 2, 0, 20, 143, 50], bytes:bytearray(b'\xff6\x02\x00\x14\x8f2')
+2021-04-29 07:46:02,000 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 3, 0, 20, 143, 51], bytes:bytearray(b'\xff6\x03\x00\x14\x8f3')
+2021-04-29 07:46:02,000 : DEBUG : libs.adiMotor :         sendRxSetup(): Sending rx for channel4 @address: 0x00148f28
+2021-04-29 07:46:02,001 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 4, 0, 20, 143, 40], bytes:bytearray(b'\xff6\x04\x00\x14\x8f(')
+2021-04-29 07:46:02,001 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 5, 0, 20, 143, 41], bytes:bytearray(b'\xff6\x05\x00\x14\x8f)')
+2021-04-29 07:46:02,001 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 6, 0, 20, 143, 42], bytes:bytearray(b'\xff6\x06\x00\x14\x8f*')
+2021-04-29 07:46:02,001 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 7, 0, 20, 143, 43], bytes:bytearray(b'\xff6\x07\x00\x14\x8f+')
+2021-04-29 07:46:02,102 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 0, 0, 20, 143, 48], bytes:bytearray(b'\xff6\x00\x00\x14\x8f0')
+2021-04-29 07:46:02,102 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 1, 0, 20, 143, 49], bytes:bytearray(b'\xff6\x01\x00\x14\x8f1')
+2021-04-29 07:46:02,102 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 2, 0, 20, 143, 50], bytes:bytearray(b'\xff6\x02\x00\x14\x8f2')
+2021-04-29 07:46:02,103 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 3, 0, 20, 143, 51], bytes:bytearray(b'\xff6\x03\x00\x14\x8f3')
+2021-04-29 07:46:02,103 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 4, 0, 20, 143, 40], bytes:bytearray(b'\xff6\x04\x00\x14\x8f(')
+2021-04-29 07:46:02,103 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 5, 0, 20, 143, 41], bytes:bytearray(b'\xff6\x05\x00\x14\x8f)')
+2021-04-29 07:46:02,103 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 6, 0, 20, 143, 42], bytes:bytearray(b'\xff6\x06\x00\x14\x8f*')
+2021-04-29 07:46:02,104 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 7, 0, 20, 143, 43], bytes:bytearray(b'\xff6\x07\x00\x14\x8f+')
+2021-04-29 07:46:02,104 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-29 07:46:06,104 : DEBUG : libs.adiMotor :            setSpeed(): Speed set message [255, 90, 0, 0]
+2021-04-29 07:46:06,104 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 90, 0, 0], bytes:bytearray(b'\xffZ\x00\x00')
+2021-04-29 07:46:06,104 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 80, 82], bytes:bytearray(b'\xffPR')
+2021-04-29 07:46:06,104 : INFO : libs.adiSerial :          disconnect(): disconnect
+2021-04-29 07:46:06,105 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-29 08:18:17,788 : INFO : libs.adiSerial :             connect(): connect
+2021-04-29 08:18:17,815 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-29 08:18:17,815 : DEBUG : libs.adiMotor :           configure(): Sending configuration message [255, 70, 16, 0, 51, 51, 11, 184, 10, 0, 0]
+2021-04-29 08:18:17,816 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 70, 16, 0, 51, 51, 11, 184, 10, 0, 0], bytes:bytearray(b'\xffF\x10\x0033\x0b\xb8\n\x00\x00')
+2021-04-29 08:18:17,816 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-29 08:18:17,816 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 53, 8], bytes:bytearray(b'\xff5\x08')
+2021-04-29 08:18:17,817 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 64, 0, 200], bytes:bytearray(b'\xff@\x00\xc8')
+2021-04-29 08:18:17,817 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-29 08:18:17,817 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
+2021-04-29 08:18:17,817 : DEBUG : libs.adiMotor :         sendRxSetup(): Sending rx for channel0 @address: 0x00148f30
+2021-04-29 08:18:17,817 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 0, 0, 20, 143, 48], bytes:bytearray(b'\xff6\x00\x00\x14\x8f0')
+2021-04-29 08:18:17,818 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 1, 0, 20, 143, 49], bytes:bytearray(b'\xff6\x01\x00\x14\x8f1')
+2021-04-29 08:18:17,818 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 2, 0, 20, 143, 50], bytes:bytearray(b'\xff6\x02\x00\x14\x8f2')
+2021-04-29 08:18:17,818 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 3, 0, 20, 143, 51], bytes:bytearray(b'\xff6\x03\x00\x14\x8f3')
+2021-04-29 08:18:17,818 : DEBUG : libs.adiMotor :         sendRxSetup(): Sending rx for channel4 @address: 0x00148f28
+2021-04-29 08:18:17,818 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 4, 0, 20, 143, 40], bytes:bytearray(b'\xff6\x04\x00\x14\x8f(')
+2021-04-29 08:18:17,819 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 5, 0, 20, 143, 41], bytes:bytearray(b'\xff6\x05\x00\x14\x8f)')
+2021-04-29 08:18:17,819 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 6, 0, 20, 143, 42], bytes:bytearray(b'\xff6\x06\x00\x14\x8f*')
+2021-04-29 08:18:17,819 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 7, 0, 20, 143, 43], bytes:bytearray(b'\xff6\x07\x00\x14\x8f+')
+2021-04-29 08:18:17,920 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 0, 0, 20, 143, 48], bytes:bytearray(b'\xff6\x00\x00\x14\x8f0')
+2021-04-29 08:18:17,920 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 1, 0, 20, 143, 49], bytes:bytearray(b'\xff6\x01\x00\x14\x8f1')
+2021-04-29 08:18:17,920 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 2, 0, 20, 143, 50], bytes:bytearray(b'\xff6\x02\x00\x14\x8f2')
+2021-04-29 08:18:17,921 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 3, 0, 20, 143, 51], bytes:bytearray(b'\xff6\x03\x00\x14\x8f3')
+2021-04-29 08:18:17,921 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 4, 0, 20, 143, 40], bytes:bytearray(b'\xff6\x04\x00\x14\x8f(')
+2021-04-29 08:18:17,921 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 5, 0, 20, 143, 41], bytes:bytearray(b'\xff6\x05\x00\x14\x8f)')
+2021-04-29 08:18:17,921 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 6, 0, 20, 143, 42], bytes:bytearray(b'\xff6\x06\x00\x14\x8f*')
+2021-04-29 08:18:17,921 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 54, 7, 0, 20, 143, 43], bytes:bytearray(b'\xff6\x07\x00\x14\x8f+')
+2021-04-29 08:18:17,922 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 52, 1], bytes:bytearray(b'\xff4\x01')
+2021-04-29 08:18:22,003 : DEBUG : libs.adiMotor :            setSpeed(): Speed set message [255, 90, 0, 0]
+2021-04-29 08:18:22,003 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 90, 0, 0], bytes:bytearray(b'\xffZ\x00\x00')
+2021-04-29 08:18:22,003 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 80, 82], bytes:bytearray(b'\xffPR')
+2021-04-29 08:18:22,003 : INFO : libs.adiSerial :          disconnect(): disconnect
+2021-04-29 08:18:22,004 : DEBUG : libs.adiSerial :         sendAsBytes(): Sending command over serial: raw:[255, 65, 0], bytes:bytearray(b'\xffA\x00')
